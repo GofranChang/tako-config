@@ -64,5 +64,5 @@
 //   pinctrl-1 = <&nice_view_spi_sleep>;
 //   pinctrl-names = "default", "sleep";
 
-//   cs-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
+//   // cs-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
 // };
