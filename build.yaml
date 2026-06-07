@@ -14,8 +14,8 @@
 ---
 include:
   - board: nice_nano_v2
-    shield: tako_left
+    shield: tako_left nice_view_custom
     cmake-args: -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/tako_drivers/"
   - board: nice_nano_v2
-    shield: tako_right
+    shield: tako_right nice_view_custom
     cmake-args: -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/tako_drivers/"
