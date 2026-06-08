@@ -15,6 +15,10 @@
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
 
+#include <zephyr/kernel.h>
+#include <inttypes.h>
+#define DEBUG_TIME LOG_DBG("ZGF time log %s : %d. %lds, %ldms", __FILE__, __LINE__, k_uptime_get(), k_uptime_get());
+
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define WAIT_DISCHARGE()
@@ -125,14 +129,17 @@ static int kscan_ec_configure(const struct device *dev,
 }
 
 static int kscan_ec_enable(const struct device *dev) {
+  DEBUG_TIME
   LOG_DBG("KSCAN EC enable");
 
   struct kscan_ec_data *data = dev->data;
   const struct kscan_ec_config *config = dev->config;
 
+  DEBUG_TIME
   k_timer_start(&data->work_timer, K_MSEC(config->poll_period_ms),
                 K_MSEC(config->poll_period_ms));
 
+  DEBUG_TIME
   return 0;
 }
 
@@ -254,6 +261,7 @@ static void kscan_ec_work_handler(struct k_work *work) {
 }
 
 static int kscan_ec_init(const struct device *dev) {
+  DEBUG_TIME
   LOG_DBG("KSCAN EC init");
 
   struct kscan_ec_data *data = dev->data;
@@ -261,46 +269,61 @@ static int kscan_ec_init(const struct device *dev) {
 
   int rc = 0;
 
+  DEBUG_TIME
   LOG_WRN("EC Channel: %d", config->adc_channel.channel_cfg.channel_id);
   LOG_WRN("EC Channel 2: %d", config->adc_channel.channel_id);
 
+  DEBUG_TIME
   gpio_pin_configure_dt(&config->power.spec, GPIO_OUTPUT_INACTIVE);
+  DEBUG_TIME
 
   data->dev = dev;
 
+  DEBUG_TIME
   data->adc_seq = (struct adc_sequence){
       .buffer = &data->adc_raw,
       .buffer_size = sizeof(data->adc_raw),
   };
 
+  DEBUG_TIME
   rc = adc_channel_setup_dt(&config->adc_channel);
+  DEBUG_TIME
   if (rc < 0) {
     LOG_ERR("ADC channel setup error %d", rc);
   }
 
+  DEBUG_TIME
   rc = adc_sequence_init_dt(&config->adc_channel, &data->adc_seq);
+  DEBUG_TIME
   if (rc < 0) {
     LOG_ERR("ADC sequence init error %d", rc);
   }
 
+  DEBUG_TIME
   gpio_pin_configure_dt(&config->discharge.spec, GPIO_OUTPUT_INACTIVE);
+  DEBUG_TIME
 
   // Init rows
   for (int i = 0; i < config->direct.len; i++) {
     gpio_pin_configure_dt(&config->direct.gpios[i].spec, GPIO_OUTPUT_INACTIVE);
   }
 
+  DEBUG_TIME
   // Init mux sel
   for (int i = 0; i < config->mux_sels.len; i++) {
     gpio_pin_configure_dt(&config->mux_sels.gpios[i].spec,
                           GPIO_OUTPUT_INACTIVE);
   }
+  DEBUG_TIME
 
   // Enable mux
   gpio_pin_configure_dt(&config->mux_en.spec, GPIO_OUTPUT_INACTIVE);
+  DEBUG_TIME
 
   k_timer_init(&data->work_timer, kscan_ec_timer_handler, NULL);
+  DEBUG_TIME
   k_work_init(&data->work, kscan_ec_work_handler);
+  DEBUG_TIME
 
   return 0;
 }
