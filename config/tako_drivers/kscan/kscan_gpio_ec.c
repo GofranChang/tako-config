@@ -17,7 +17,7 @@
 
 #include <zephyr/kernel.h>
 #include <inttypes.h>
-#define DEBUG_TIME LOG_DBG("ZGF time log %s : %d. %lds, %ldms", __FILE__, __LINE__, k_uptime_get(), k_uptime_get());
+#define DEBUG_TIME LOG_DBG("ZGF time log %s : %d. %lds, %ldms", __FILE__, __LINE__, k_uptime_get() / 1000, k_uptime_get() % 1000);
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -165,13 +165,17 @@ static void kscan_ec_work_handler(struct k_work *work) {
 
   int rc;
 
+  DEBUG_TIME
   int16_t matrix_read[config->rows * config->cols];
 
   /* Power on */
+  DEBUG_TIME
   gpio_pin_set_dt(&config->power.spec, 1);
 
+  DEBUG_TIME
   /* Wait for everything to power on. */
   k_sleep(K_MSEC(2));
+  DEBUG_TIME
 
   for (int col = 0; col < config->cols; col++) {
     uint8_t ch = config->col_channels[col];
@@ -214,16 +218,24 @@ static void kscan_ec_work_handler(struct k_work *work) {
   }
 
   /* Power off */
+  DEBUG_TIME
   gpio_pin_set_dt(&config->power.spec, 0);
+  DEBUG_TIME
   gpio_pin_set_dt(&config->mux_en.spec, 0);
+  DEBUG_TIME
 
   for (int i = 0; i < config->direct.len; i++) {
+  DEBUG_TIME
     gpio_pin_set_dt(&config->direct.gpios[i].spec, 0);
+  DEBUG_TIME
   }
 
   for (int i = 0; i < config->mux_sels.len; i++) {
+  DEBUG_TIME
     gpio_pin_set_dt(&config->mux_sels.gpios[i].spec, 0);
+  DEBUG_TIME
   }
+  DEBUG_TIME
 
   /* Print matrix reads */
   static int cnt = 0;
@@ -243,6 +255,7 @@ static void kscan_ec_work_handler(struct k_work *work) {
     printk("\n\n");
   }
 
+  DEBUG_TIME
   /* Handle matrix reads */
   for (int r = 0; r < config->rows; r++) {
     for (int c = 0; c < config->cols; c++) {
