@@ -7,19 +7,27 @@
 #include "debounce.h"
 #include "kscan_gpio.h"
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <zephyr/device.h>
+#include <zephyr/kernel.h>
 #include <zephyr/drivers/adc.h>
 #include <zephyr/drivers/kscan.h>
 #include <zephyr/logging/log.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
 
-#include <zephyr/kernel.h>
-#include <inttypes.h>
-#define DEBUG_TIME LOG_DBG("ZGF time log %s : %d. %lds, %ldms", __FILE__, __LINE__, k_uptime_get() / 1000, k_uptime_get() % 1000);
-
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
+
+#define KSCAN_EC_LOG_TIME(label)                                               \
+  do {                                                                         \
+    int64_t uptime_ms = k_uptime_get();                                        \
+    LOG_INF("ZGF %s uptime=%" PRId64 ".%03" PRId64 "s", label,               \
+            uptime_ms / 1000, uptime_ms % 1000);                               \
+  } while (0)
+
+static bool kscan_ec_first_timer_recorded;
+static int64_t kscan_ec_first_timer_ms;
 
 #define WAIT_DISCHARGE()
 #define WAIT_CHARGE()
@@ -115,6 +123,7 @@ static int state_index_rc(const struct kscan_ec_config *config, const int row,
 
 static int kscan_ec_configure(const struct device *dev,
                               const kscan_callback_t callback) {
+  KSCAN_EC_LOG_TIME("configure enter");
   LOG_DBG("KSCAN EC configure");
 
   struct kscan_ec_data *data = dev->data;
@@ -124,35 +133,47 @@ static int kscan_ec_configure(const struct device *dev,
   }
 
   data->callback = callback;
+  KSCAN_EC_LOG_TIME("configure callback set");
 
   return 0;
 }
 
 static int kscan_ec_enable(const struct device *dev) {
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("enable enter");
   LOG_DBG("KSCAN EC enable");
 
   struct kscan_ec_data *data = dev->data;
   const struct kscan_ec_config *config = dev->config;
 
-  DEBUG_TIME
+  LOG_INF("ZGF enable periods poll=%d idle=%d sleep=%d",
+          config->poll_period_ms, config->idle_poll_period_ms,
+          config->sleep_poll_period_ms);
+
+  KSCAN_EC_LOG_TIME("enable before timer start");
   k_timer_start(&data->work_timer, K_MSEC(config->poll_period_ms),
                 K_MSEC(config->poll_period_ms));
+  KSCAN_EC_LOG_TIME("enable after timer start");
 
-  DEBUG_TIME
   return 0;
 }
 
 static int kscan_ec_disable(const struct device *dev) {
+  KSCAN_EC_LOG_TIME("disable enter");
   LOG_DBG("KSCAN EC disable");
 
   struct kscan_ec_data *data = dev->data;
   k_timer_stop(&data->work_timer);
+  KSCAN_EC_LOG_TIME("disable after timer stop");
 
   return 0;
 }
 
 static void kscan_ec_timer_handler(struct k_timer *timer) {
+  if (!kscan_ec_first_timer_recorded) {
+    kscan_ec_first_timer_recorded = true;
+    kscan_ec_first_timer_ms = k_uptime_get();
+  }
+
   struct kscan_ec_data *data =
       CONTAINER_OF(timer, struct kscan_ec_data, work_timer);
   k_work_submit(&data->work);
@@ -164,18 +185,31 @@ static void kscan_ec_work_handler(struct k_work *work) {
   struct adc_sequence *adc_seq = &data->adc_seq;
 
   int rc;
+  int64_t scan_start_ms = k_uptime_get();
+  static bool first_scan_logged = false;
+  bool scan_is_first = !first_scan_logged;
 
-  DEBUG_TIME
+  if (scan_is_first) {
+    first_scan_logged = true;
+    if (kscan_ec_first_timer_recorded) {
+      LOG_INF("ZGF first timer handler uptime=%" PRId64 ".%03" PRId64 "s",
+              kscan_ec_first_timer_ms / 1000,
+              kscan_ec_first_timer_ms % 1000);
+    }
+    KSCAN_EC_LOG_TIME("first scan enter");
+  }
+
   int16_t matrix_read[config->rows * config->cols];
 
   /* Power on */
-  DEBUG_TIME
   gpio_pin_set_dt(&config->power.spec, 1);
 
-  DEBUG_TIME
   /* Wait for everything to power on. */
   k_sleep(K_MSEC(2));
-  DEBUG_TIME
+
+  if (scan_is_first) {
+    KSCAN_EC_LOG_TIME("first scan after power sleep");
+  }
 
   for (int col = 0; col < config->cols; col++) {
     uint8_t ch = config->col_channels[col];
@@ -199,7 +233,13 @@ static void kscan_ec_work_handler(struct k_work *work) {
 
       WAIT_CHARGE();
 
+      int64_t adc_start_ms = k_uptime_get();
       rc = adc_read(config->adc_channel.dev, adc_seq);
+      int64_t adc_elapsed_ms = k_uptime_get() - adc_start_ms;
+      if (adc_elapsed_ms > 10) {
+        LOG_WRN("ZGF adc_read slow row=%d col=%d elapsed=%" PRId64 "ms",
+                row, col, adc_elapsed_ms);
+      }
       adc_seq->calibrate = false;
 
       if (rc == 0) {
@@ -218,24 +258,29 @@ static void kscan_ec_work_handler(struct k_work *work) {
   }
 
   /* Power off */
-  DEBUG_TIME
   gpio_pin_set_dt(&config->power.spec, 0);
-  DEBUG_TIME
   gpio_pin_set_dt(&config->mux_en.spec, 0);
-  DEBUG_TIME
 
   for (int i = 0; i < config->direct.len; i++) {
-  DEBUG_TIME
     gpio_pin_set_dt(&config->direct.gpios[i].spec, 0);
-  DEBUG_TIME
   }
 
   for (int i = 0; i < config->mux_sels.len; i++) {
-  DEBUG_TIME
     gpio_pin_set_dt(&config->mux_sels.gpios[i].spec, 0);
-  DEBUG_TIME
   }
-  DEBUG_TIME
+
+  int64_t scan_elapsed_ms = k_uptime_get() - scan_start_ms;
+  if (scan_is_first) {
+    LOG_INF("ZGF first scan raw read done elapsed=%" PRId64 "ms",
+            scan_elapsed_ms);
+  } else if (scan_elapsed_ms > config->poll_period_ms) {
+    static int slow_scan_log_cnt = 0;
+
+    if ((slow_scan_log_cnt++ % 100) == 0) {
+      LOG_WRN("ZGF scan slow elapsed=%" PRId64 "ms poll=%d",
+              scan_elapsed_ms, config->poll_period_ms);
+    }
+  }
 
   /* Print matrix reads */
   static int cnt = 0;
@@ -255,7 +300,6 @@ static void kscan_ec_work_handler(struct k_work *work) {
     printk("\n\n");
   }
 
-  DEBUG_TIME
   /* Handle matrix reads */
   for (int r = 0; r < config->rows; r++) {
     for (int c = 0; c < config->cols; c++) {
@@ -263,9 +307,13 @@ static void kscan_ec_work_handler(struct k_work *work) {
       const bool pressed = data->matrix_state[index];
 
       if (!pressed && matrix_read[index] > actuation_threshold[index]) {
+        LOG_INF("ZGF key event row=%d col=%d pressed=1 value=%d uptime=%" PRId64 "ms",
+                r, c, matrix_read[index], k_uptime_get());
         data->matrix_state[index] = true;
         data->callback(data->dev, r, c, true);
       } else if (pressed && matrix_read[index] < release_threshold[index]) {
+        LOG_INF("ZGF key event row=%d col=%d pressed=0 value=%d uptime=%" PRId64 "ms",
+                r, c, matrix_read[index], k_uptime_get());
         data->matrix_state[index] = false;
         data->callback(data->dev, r, c, false);
       }
@@ -274,7 +322,7 @@ static void kscan_ec_work_handler(struct k_work *work) {
 }
 
 static int kscan_ec_init(const struct device *dev) {
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init enter");
   LOG_DBG("KSCAN EC init");
 
   struct kscan_ec_data *data = dev->data;
@@ -282,67 +330,64 @@ static int kscan_ec_init(const struct device *dev) {
 
   int rc = 0;
 
-  DEBUG_TIME
   LOG_WRN("EC Channel: %d", config->adc_channel.channel_cfg.channel_id);
   LOG_WRN("EC Channel 2: %d", config->adc_channel.channel_id);
+  LOG_INF("ZGF init periods poll=%d idle=%d sleep=%d rows=%d cols=%d",
+          config->poll_period_ms, config->idle_poll_period_ms,
+          config->sleep_poll_period_ms, (int)config->rows,
+          (int)config->cols);
 
-  DEBUG_TIME
   gpio_pin_configure_dt(&config->power.spec, GPIO_OUTPUT_INACTIVE);
-  DEBUG_TIME
 
   data->dev = dev;
 
-  DEBUG_TIME
   data->adc_seq = (struct adc_sequence){
       .buffer = &data->adc_raw,
       .buffer_size = sizeof(data->adc_raw),
   };
 
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init before adc channel setup");
   rc = adc_channel_setup_dt(&config->adc_channel);
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init after adc channel setup");
   if (rc < 0) {
     LOG_ERR("ADC channel setup error %d", rc);
   }
 
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init before adc sequence init");
   rc = adc_sequence_init_dt(&config->adc_channel, &data->adc_seq);
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init after adc sequence init");
   if (rc < 0) {
     LOG_ERR("ADC sequence init error %d", rc);
   }
 
-  DEBUG_TIME
   gpio_pin_configure_dt(&config->discharge.spec, GPIO_OUTPUT_INACTIVE);
-  DEBUG_TIME
 
   // Init rows
   for (int i = 0; i < config->direct.len; i++) {
     gpio_pin_configure_dt(&config->direct.gpios[i].spec, GPIO_OUTPUT_INACTIVE);
   }
 
-  DEBUG_TIME
   // Init mux sel
   for (int i = 0; i < config->mux_sels.len; i++) {
     gpio_pin_configure_dt(&config->mux_sels.gpios[i].spec,
                           GPIO_OUTPUT_INACTIVE);
   }
-  DEBUG_TIME
 
   // Enable mux
   gpio_pin_configure_dt(&config->mux_en.spec, GPIO_OUTPUT_INACTIVE);
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init gpio done");
 
   k_timer_init(&data->work_timer, kscan_ec_timer_handler, NULL);
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init after timer init");
   k_work_init(&data->work, kscan_ec_work_handler);
-  DEBUG_TIME
+  KSCAN_EC_LOG_TIME("init after work init");
 
   return 0;
 }
 
 static int kscan_ec_activity_event_handler(const struct device *dev,
                                            const zmk_event_t *eh) {
+  KSCAN_EC_LOG_TIME("activity handler enter");
   struct zmk_activity_state_changed *ev = as_zmk_activity_state_changed(eh);
 
   if (ev == NULL) {
@@ -369,8 +414,11 @@ static int kscan_ec_activity_event_handler(const struct device *dev,
     return -EINVAL;
   }
 
+  LOG_INF("ZGF activity state=%d poll_period=%d", ev->state, poll_period);
   LOG_DBG("Setting poll period to %dms", poll_period);
+  KSCAN_EC_LOG_TIME("activity before timer start");
   k_timer_start(&data->work_timer, K_MSEC(poll_period), K_MSEC(poll_period));
+  KSCAN_EC_LOG_TIME("activity after timer start");
 
   return 0;
 }
