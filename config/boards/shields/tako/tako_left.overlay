@@ -50,20 +50,6 @@
   };
 };
 
-// &nice_view_spi {
-//     cs-gpios = <&pro_micro 7 GPIO_ACTIVE_HIGH>;
-// };
-
-// nice_view_spi: &spi1 {
-//     compatible = "nordic,nrf-spim";
-//     status = "okay";
-
-//     pinctrl-0 = <&nice_view_spi_default>;
-//     pinctrl-1 = <&nice_view_spi_sleep>;
-//     pinctrl-names = "default", "sleep";
-
-//     cs-gpios = <&gpio0 6 GPIO_ACTIVE_HIGH>;
-// };
 
 &pinctrl {
     nice_view_spi_default: nice_view_spi_default {

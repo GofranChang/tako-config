@@ -18,5 +18,5 @@ include:
     snippet: zmk-usb-logging
     cmake-args: -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/tako_drivers/"
   - board: nice_nano_v2
-    shield: tako_right #nice_view
+    shield: tako_right nice_view
     cmake-args: -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/tako_drivers/"
