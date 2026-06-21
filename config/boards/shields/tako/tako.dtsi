@@ -9,7 +9,7 @@
 #include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
 #include <zephyr/dt-bindings/gpio/gpio.h>
 
-#include "tako-layouts.dtsi"
+// #include "tako-layouts.dtsi"
 
 / {
     chosen {
