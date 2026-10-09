@@ -14,8 +14,8 @@ manifest:
     - name: nice-view-elemental
       remote: kevinpastor
       revision: main
-    - name: ec-support-zmk-module
+    - name: analog-matrix-module
       remote: petejohanson
-      revision: bcb61bdee0a548976bea8f376f8cdec6b4ffd5fe
+      revision: a2c73edfcee7d7e626d323982b14dcd1e2b88332
   self:
     path: config

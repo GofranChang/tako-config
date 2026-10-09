@@ -90,3 +90,18 @@
     cs-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
 };
 */
+
+/* The generic analog calibrator enables the shell but supplies no USB overlay.
+ * Give it its own CDC interface, separate from the left-side Studio port.
+ */
+/ {
+    chosen {
+        zephyr,shell-uart = &tako_ec_shell_uart;
+    };
+};
+
+&zephyr_udc0 {
+    tako_ec_shell_uart: tako_ec_shell_uart {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};
