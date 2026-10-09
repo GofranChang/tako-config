@@ -12,27 +12,47 @@
   };
 
   kscan: kscan {
-    compatible = "zmk,kscan-gpio-ec";
+    compatible = "zmk,kscan-ec-matrix";
     label = "KSCAN";
-    row-gpios
+    strobe-gpios
     = <&pro_micro 21 GPIO_ACTIVE_HIGH>
     , <&pro_micro 20 GPIO_ACTIVE_HIGH>
     , <&pro_micro 18 GPIO_ACTIVE_HIGH>
     , <&pro_micro 14 GPIO_ACTIVE_HIGH>
     ;
 
-    mux-sel-gpios
-    = <&pro_micro 9 GPIO_ACTIVE_HIGH>
-    , <&pro_micro 8 GPIO_ACTIVE_HIGH>
-    , <&pro_micro 7 GPIO_ACTIVE_HIGH>
-    ;
-
-    mux-en-gpios = <&pro_micro 4 GPIO_ACTIVE_HIGH>;
-    discharge-gpios = <&pro_micro 6 GPIO_ACTIVE_HIGH>;
-    col-channels = <2 4 6 7 5>;
+    input-gpios =
+      <&ec_mux 2 GPIO_ACTIVE_HIGH>,
+      <&ec_mux 4 GPIO_ACTIVE_HIGH>,
+      <&ec_mux 6 GPIO_ACTIVE_HIGH>,
+      <&ec_mux 7 GPIO_ACTIVE_HIGH>,
+      <&ec_mux 5 GPIO_ACTIVE_HIGH>;
+    drain-gpios = <&pro_micro 6 GPIO_ACTIVE_HIGH>;
+    /* Only inputs 0 and 1 exist on the thumb row. */
+    strobe-input-masks = <0 0 0 0x1c>;
+    matrix-warm-up-us = <2000>;
+    trigger-percentage = <50>;
+    dynamic-polling-interval;
+    active-polling-interval-ms = <10>;
+    idle-polling-interval-ms = <30>;
+    sleep-polling-interval-ms = <3000>;
+    idle-after-secs = <5>;
+    sleep-after-secs = <900>;
     io-channels = <&adc 1>;
     power-gpios = <&pro_micro 5 GPIO_ACTIVE_HIGH>;
   };
+  ec_mux: ec_mux {
+    compatible = "zmk,gpio-mux";
+    gpio-controller;
+    #gpio-cells = <2>;
+    select-gpios =
+      <&pro_micro 9 GPIO_ACTIVE_HIGH>,
+      <&pro_micro 8 GPIO_ACTIVE_HIGH>,
+      <&pro_micro 7 GPIO_ACTIVE_HIGH>;
+    /* The physical mux enable is active low. */
+    en-gpios = <&pro_micro 4 GPIO_ACTIVE_LOW>;
+  };
+
 };
 
 &default_transform {

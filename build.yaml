@@ -1,32 +1,12 @@
-# This file generates the GitHub Actions matrix
-# For simple board + shield combinations, add them
-# to the top level board and shield arrays, for more
-# control, add individual board + shield combinations to
-# the `include` property, e.g:
-#
-# board: [ "nice_nano_v2" ]
-# shield: [ "corne_left", "corne_right" ]
-# include:
-#   - board: bdn9_rev2
-#   - board: nice_nano_v2
-#     shield: reviung41
-#
+# ZMK v0.3, with per-half EC calibration over USB.
 ---
 include:
-  # - board: nice_nano_v2
-  #   shield: tako_left nice_view
-  #   snippet: zmk-usb-logging
-  #   cmake-args: -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/tako_drivers/"
-
   - board: nice_nano_v2
     shield: tako_left nice_view_elemental
-    snippet: studio-rpc-usb-uart
-    cmake-args: >-
-      -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/tako_drivers/"
-      -DCONFIG_ZMK_STUDIO=y
+    snippet: studio-rpc-usb-uart enable_ec_calibrator
+    cmake-args: -DCONFIG_ZMK_STUDIO=y
   - board: nice_nano_v2
     shield: tako_right nice_view_elemental
-    cmake-args: -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/tako_drivers/"
-
+    snippet: enable_ec_calibrator
   - board: nice_nano_v2
     shield: settings_reset

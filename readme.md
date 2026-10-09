@@ -1,9 +1,26 @@
-# Tako zmk config
+# Tako ZMK config — EC module migration
 
-The first thing you should do after assembling the keyboard is to calibrate the matrix.
+This config uses [petejohanson/ec-support-zmk-module](https://github.com/petejohanson/ec-support-zmk-module), pinned to `bcb61bdee0a548976bea8f376f8cdec6b4ffd5fe`, with ZMK v0.3.
 
-You should be able to access ZMK logs through the console. See [ZMK docs](https://zmk.dev/docs/development/usb-logging) for details.
+The existing Miryoku keymap, matrix transform, ADC settings, screen wiring, and left-side Studio support are retained. The old ssbb source remains in `config/tako_drivers` for reference, but is no longer registered with the build. Do not restore its `ZMK_EXTRA_MODULES` argument when using the new driver.
 
-Next, you should adjust actuation and release values for each key in the `config/tako_drivers/kscan/kscan_gpio_ec.c` file. Basically, actuation should happen at the tactile bump, but you can prefer different levels depending on your typing style. If the key actuates too early, then increase the value in the `actuation_threshold`. If it's too late, then decrease it. After this is done, you should change the `release_threshold` to reflect the actuation change – reducing it by 50 should work great.
+## First flash and calibration
 
-Don't map actuation levels too close to base reads (what you see in console when no touching keys).
+The old absolute 650/600 thresholds are not calibration data for this driver. Neither half will report keys until it has valid high/low calibration values. Calibrate both halves separately before using the keyboard.
+
+1. Build through GitHub Actions and flash the matching left/right UF2 to each half. Keep a copy of your last working ssbb UF2 for rollback.
+2. Connect one half by USB. Open its USB serial shell at 115200 baud. On the left there are two CDC ports: Studio and the shell; choose the one with the shell prompt.
+3. Type `ec` and use Tab completion to find the matrix device name. It is expected to be `KSCAN` (the overlay label).
+4. Run `ec KSCAN calibration start`. Leave every key released during low sampling. When high sampling starts, slowly press each of the 17 keys on this half fully and release it when its calibration is acknowledged. The verbose output identifies positions by `(strobe,input)`, matching matrix `(row,column)`.
+5. After `Calibration complete!`, run `ec KSCAN calibration export` and keep the output as a backup. Run `ec KSCAN calibration save`, then reboot and check that all keys work. Saved values are loaded from flash on boot.
+6. Repeat on the other half. If Tab completion gives a different device name, substitute it in the commands above.
+
+The three unused positions in row 3 are masked. `trigger-percentage = <50>` starts at the midpoint of each calibrated range. The pinned driver computes its raw press limit as `high - range * percentage / 100`; increasing this value lowers the raw trigger threshold. Tune only after calibration and a typing check. Hysteresis is derived from the range and measured noise.
+
+The scan intervals initially retain the old 10 ms active / 30 ms idle / 3000 ms sleep behavior, with a 2 ms matrix power warm-up. ZMK deep sleep is disabled: the new driver stops scanning when suspended, and this keyboard has no sensor to resume it. The 3000 ms slow scan rate can delay the first key after 15 minutes of inactivity. Actual performance, power consumption, and wake behavior need checking on the keyboard. No ADXL362 wake-up hardware is configured, so `CONFIG_SLEEP_AWAKE_TRIGGER=n` is required.
+
+`settings_reset` erases stored settings, including EC calibration. Recalibrate both halves after using it. Existing Miryoku keys that reset settings have the same effect.
+
+## Rollback
+
+Flash your previous working ssbb firmware to both halves. Its thresholds are compiled into that firmware. For a source rollback, restore the previous overlays, `config/west.yml`, `build.yaml`, and half configs together.

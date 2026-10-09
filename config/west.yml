@@ -2,6 +2,8 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+    - name: petejohanson
+      url-base: https://github.com/petejohanson
     - name: kevinpastor
       url-base: https://github.com/kevinpastor
   projects:
@@ -12,5 +14,8 @@ manifest:
     - name: nice-view-elemental
       remote: kevinpastor
       revision: main
+    - name: ec-support-zmk-module
+      remote: petejohanson
+      revision: bcb61bdee0a548976bea8f376f8cdec6b4ffd5fe
   self:
     path: config
