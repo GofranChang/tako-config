@@ -2,7 +2,7 @@
 
 This config uses [petejohanson/ec-support-zmk-module](https://github.com/petejohanson/ec-support-zmk-module), pinned to `bcb61bdee0a548976bea8f376f8cdec6b4ffd5fe`, with ZMK v0.3.
 
-The existing Miryoku keymap, matrix transform, ADC settings, screen wiring, and left-side Studio support are retained. The old ssbb source remains in `config/tako_drivers` for reference, but is no longer registered with the build. Do not restore its `ZMK_EXTRA_MODULES` argument when using the new driver.
+The existing Miryoku keymap, matrix transform, ADC settings, screen wiring, and left-side Studio support are retained. The legacy ssbb driver and its device-tree binding have been removed. The EC driver is provided by the pinned external module in `config/west.yml`.
 
 ## First flash and calibration
 
@@ -17,7 +17,7 @@ The old absolute 650/600 thresholds are not calibration data for this driver. Ne
 
 The three unused positions in row 3 are masked. `trigger-percentage = <50>` starts at the midpoint of each calibrated range. The pinned driver computes its raw press limit as `high - range * percentage / 100`; increasing this value lowers the raw trigger threshold. Tune only after calibration and a typing check. Hysteresis is derived from the range and measured noise.
 
-The scan intervals initially retain the old 10 ms active / 30 ms idle / 3000 ms sleep behavior, with a 2 ms matrix power warm-up. ZMK deep sleep is disabled: the new driver stops scanning when suspended, and this keyboard has no sensor to resume it. The 3000 ms slow scan rate can delay the first key after 15 minutes of inactivity. Actual performance, power consumption, and wake behavior need checking on the keyboard. No ADXL362 wake-up hardware is configured, so `CONFIG_SLEEP_AWAKE_TRIGGER=n` is required.
+The scan intervals initially retain the old 10 ms active / 30 ms idle / 3000 ms sleep behavior, with a 2 ms matrix power warm-up. ZMK deep sleep is enabled after 15 minutes of inactivity (`CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000`). The EC scanner stops scanning in deep sleep; press the physical reset button on each sleeping half to restart it. Saved EC calibration is loaded again on boot. Actual performance, power consumption, and wake behavior need checking on the keyboard. No ADXL362 wake-up hardware is configured, so `CONFIG_SLEEP_AWAKE_TRIGGER=n` is required.
 
 `settings_reset` erases stored settings, including EC calibration. Recalibrate both halves after using it. Existing Miryoku keys that reset settings have the same effect.
 
