@@ -1,5 +1,7 @@
 # Tako ZMK — Analog Matrix EC 驱动
 
+> 代码生成说明：本仓库的项目代码由 ChatGPT 生成。上游依赖及引用源码保留各自的作者信息和许可证。
+
 本分支基于 `pete_driver` 的 `22c0556`，使用 [petejohanson/analog-matrix-module](https://github.com/petejohanson/analog-matrix-module)，固定提交 `a2c73edfcee7d7e626d323982b14dcd1e2b88332`。使用其中的 EC 驱动，ZMK 保持 v0.3（Zephyr v3.5.0+zmk-fixes）。上游仅支持 Zephyr 4.1 及更早版本，不要单独升级到移除 KSCAN API 的 Zephyr 版本。
 
 保留当前左右 GPIO、MUX 通道顺序、ADC、屏幕、34 键 Miryoku、矩阵变换、左半 Studio，以及 15 分钟深度睡眠。左右半都包含正常键盘功能和 USB 校准功能。
