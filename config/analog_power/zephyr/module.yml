@@ -1,4 +1,0 @@
-name: tako_analog_power
-build:
-  cmake: .
-  kconfig: Kconfig

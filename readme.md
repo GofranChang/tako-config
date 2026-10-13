@@ -1,23 +1,23 @@
 # Tako ZMK — Analog Matrix EC 驱动
 
-本分支基于 `pete_driver` 的 `22c0556`，使用 [petejohanson/analog-matrix-module](https://github.com/petejohanson/analog-matrix-module)，固定提交 `a2c73edfcee7d7e626d323982b14dcd1e2b88332`。使用其中的 EC 驱动，ZMK 保持 v0.3（Zephyr v3.5.0+zmk-fixes）。上游仅支持 Zephyr 4.1 及更早版本，不要单独升级到移除 KSCAN API 的 Zephyr 版本。
+本分支基于 `pete_driver` 的 `22c0556`，使用 [GofranChang/analog-matrix-module](https://github.com/GofranChang/analog-matrix-module) fork 的 `codex/fix-ec-power` 分支，固定提交 `c297ab16333262c51d881536322734bc5080469f`（基于上游 `a2c73edfcee7d7e626d323982b14dcd1e2b88332`）。使用其中的 EC 驱动，ZMK 保持 v0.3（Zephyr v3.5.0+zmk-fixes）。上游仅支持 Zephyr 4.1 及更早版本，不要单独升级到移除 KSCAN API 的 Zephyr 版本。
 
 保留当前左右 GPIO、MUX 通道顺序、ADC、屏幕、34 键 Miryoku、矩阵变换、左半 Studio，以及 15 分钟深度睡眠。左右半都保留正常键盘功能、USB 校准 Shell 和串口。
 
 ## 日常省电与构建配置
 
-为确认耗电原因，当前保留与 `codex/analog-matrix-driver` 一致的左右校准 Shell、USB CDC、详细校准功能，以及左半 Studio，不再区分日常和校准固件。构建继续使用上游 `zmk-analog-matrix-calibrator` snippet，只额外加入下述驱动电源修复。**不要刷 settings_reset**，已有校准数据继续使用。
+为确认耗电原因，当前保留与 `codex/analog-matrix-driver` 一致的左右校准 Shell、USB CDC、详细校准功能，以及左半 Studio，不再区分日常和校准固件。构建继续使用上游 `zmk-analog-matrix-calibrator` snippet，由 fork 中的 C 驱动直接提供下述电源修复。**不要刷 settings_reset**，已有校准数据继续使用。
 
 GPIO、MUX 通道、ADC、触发比例、10/30/3000 ms 扫描间隔和 15 分钟深度睡眠参数保持一致。
 
-本地模块 `config/analog_power` 在构建目录生成固定版本上游驱动的修复副本，不修改 west 拉取的源码：
+电源修复直接提交在 fork 的 `drivers/kscan/zmk_kscan_ec_matrix.c` 和 `zmk_analog_matrix.c` 中：
 
 1. 每次扫描上电后的 2000 µs 等待由 CPU 忙等改为线程睡眠；微秒级充放电/ADC 稳定时间仍保持忙等。
 2. 停扫描/设备休眠时先取得扫描互斥锁，等待正在执行的扫描结束，再挂起线程并显式关闭矩阵电源，避免挂起恰好发生在供电期间而留下模拟电路常开。校准长时间占用锁时，等待超过一秒返回错误，由 ZMK 取消这次休眠。
 
-补丁校验两个上游文件的 SHA-256；升级模块后必须审查修复，否则构建报错，不会静默失效。手动构建时也需传入 `-DZMK_EXTRA_MODULES=/绝对路径/tako-config/config/analog_power`；两半继续使用 `-S zmk-analog-matrix-calibrator`，左侧另保留 Studio snippet。
+`config/west.yml` 指向 `GofranChang/analog-matrix-module` 并固定上述提交；ZMK 仍为 v0.3。`build.yaml` 无需额外模块参数，已删除本地 `config/analog_power` 和构建时源码替换逻辑。
 
-`config/west.yml` 仍固定 `analog-matrix-module` 的原提交和 ZMK v0.3。独立 Shell CDC overlay 继续位于 `tako.dtsi`，两半都加载。左半 Studio 使用自己的 CDC 接口。
+远程构建前先将 fork 的 `codex/fix-ec-power` 分支推送到 GitHub，让 west 能获取固定提交，再推送 Tako 配置触发构建。手动构建正常运行 `west update`，两半保留 `-S zmk-analog-matrix-calibrator`，左侧另保留 Studio snippet。独立 Shell CDC overlay 继续位于 `tako.dtsi`。
 
 共享功能保留 `CONFIG_ZMK_ANALOG_MATRIX_SETTINGS`、`CONFIG_ZMK_ANALOG_MATRIX_DYNAMIC_POLL_RATE` 和放电引脚输入/输出模拟开关。固定版本 EC 源码仍用旧 `CONFIG_ZMK_KSCAN_EC_MATRIX_DYNAMIC_POLL_RATE` 宏初始化动态扫描字段，因此继续同时保留新旧开关。
 

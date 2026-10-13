@@ -2,8 +2,8 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    - name: petejohanson
-      url-base: https://github.com/petejohanson
+    - name: gofran
+      url-base: https://github.com/GofranChang
     - name: kevinpastor
       url-base: https://github.com/kevinpastor
   projects:
@@ -15,7 +15,7 @@ manifest:
       remote: kevinpastor
       revision: main
     - name: analog-matrix-module
-      remote: petejohanson
-      revision: a2c73edfcee7d7e626d323982b14dcd1e2b88332
+      remote: gofran
+      revision: c297ab16333262c51d881536322734bc5080469f
   self:
     path: config
