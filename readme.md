@@ -4,6 +4,14 @@
 
 保留当前左右 GPIO、MUX 通道顺序、ADC、屏幕、34 键 Miryoku、矩阵变换、左半 Studio，以及 15 分钟深度睡眠。左右半都保留正常键盘功能、USB 校准 Shell 和串口。
 
+## nice!view 数字电量显示
+
+显示配置参考 [zmk-config-for-temperwenwan 的 wenwan.conf](https://github.com/GofranChang/zmk-config-for-temperwenwan/blob/main/config/wenwan.conf)：使用 ZMK 内置状态屏，启用 `CONFIG_ZMK_WIDGET_BATTERY_STATUS_SHOW_PERCENTAGE=y`，默认字体和小字体均为 Montserrat 26。左右屏分别显示本半电池的数字百分比。
+
+参考仓库的 `build.yaml` 使用 `nice_view_custom` 名称，但该 shield 没有出现在该仓库或官方 ZMK v0.3 中。因此 Tako 使用官方支持的 `nice_view` shield，配合上述内置状态屏配置实现相同的电量显示方式，不再使用 Elemental。无需第三方显示模块，也不需要修改 nice!view SPI 线路：SCK P0.20、MOSI P0.17，左 CS P0.11、右 CS P0.09。
+
+本次仅迁移显示方案；EC 驱动固定版本、触发值、校准 Shell/串口、Studio、蓝牙和休眠参数保持原配置。百分比仍来自 ZMK 的电量估算，显示数字不会提高测量精度。
+
 ## 日常省电与构建配置
 
 为确认耗电原因，当前保留与 `codex/analog-matrix-driver` 一致的左右校准 Shell、USB CDC、详细校准功能，以及左半 Studio，不再区分日常和校准固件。构建继续使用上游 `zmk-analog-matrix-calibrator` snippet，由 fork 中的 C 驱动直接提供下述电源修复。**不要刷 settings_reset**，已有校准数据继续使用。

@@ -4,16 +4,11 @@ manifest:
       url-base: https://github.com/zmkfirmware
     - name: gofran
       url-base: https://github.com/GofranChang
-    - name: kevinpastor
-      url-base: https://github.com/kevinpastor
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: v0.3
       import: app/west.yml
-    - name: nice-view-elemental
-      remote: kevinpastor
-      revision: main
     - name: analog-matrix-module
       remote: gofran
       revision: c297ab16333262c51d881536322734bc5080469f
