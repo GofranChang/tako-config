@@ -1,12 +1,15 @@
-# ZMK v0.3, with per-half EC calibration over USB.
+# Normal keyboard firmware with per-half USB calibration retained.
 ---
 include:
   - board: nice_nano_v2
     shield: tako_left nice_view_elemental
     snippet: studio-rpc-usb-uart zmk-analog-matrix-calibrator
-    cmake-args: -DCONFIG_ZMK_STUDIO=y
+    cmake-args: >-
+      -DCONFIG_ZMK_STUDIO=y
+      -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/analog_power"
   - board: nice_nano_v2
     shield: tako_right nice_view_elemental
     snippet: zmk-analog-matrix-calibrator
+    cmake-args: -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/config/analog_power"
   - board: nice_nano_v2
     shield: settings_reset
