@@ -35,7 +35,8 @@
     dynamic-polling-interval;
     active-polling-interval-ms = <10>;
     idle-polling-interval-ms = <30>;
-    sleep-polling-interval-ms = <3000>;
+    // Keep key detection responsive until ZMK actually suspends the device.
+    sleep-polling-interval-ms = <30>;
     idle-after-secs = <5>;
     sleep-after-secs = <900>;
     io-channels = <&adc 1>;

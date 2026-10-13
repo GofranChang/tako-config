@@ -59,3 +59,7 @@ GPIO、MUX 通道、ADC、触发比例、10/30/3000 ms 扫描间隔和 15 分钟
 ## 回退
 
 回到 `pete_driver`，构建并刷入旧模块固件。旧路径中的校准数据在未清除设置时仍保留；如旧固件无法恢复按键，重新校准旧驱动。双方的 Flash 校准路径独立。
+
+## Idle key response (2026-10-13)
+
+Both halves keep the 30 ms idle scan interval until ZMK actually suspends the device, instead of entering a 3000 ms scan interval after 15 minutes without local key events. The analog driver switches to the 10 ms active interval on the first raw press, while retaining two-sample press confirmation. Matrix power-off GPIO parking and 15-minute ZMK deep sleep are retained. Left-hand activity does not reset the right matrix driver’s local idle timer.
