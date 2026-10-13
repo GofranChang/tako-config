@@ -1,6 +1,6 @@
 # Tako ZMK — Analog Matrix EC 驱动
 
-本分支基于 `pete_driver` 的 `22c0556`，使用 [GofranChang/analog-matrix-module](https://github.com/GofranChang/analog-matrix-module) fork 的 `codex/fix-ec-power` 分支，固定提交 `c297ab16333262c51d881536322734bc5080469f`（基于上游 `a2c73edfcee7d7e626d323982b14dcd1e2b88332`）。使用其中的 EC 驱动，ZMK 保持 v0.3（Zephyr v3.5.0+zmk-fixes）。上游仅支持 Zephyr 4.1 及更早版本，不要单独升级到移除 KSCAN API 的 Zephyr 版本。
+本分支基于 `pete_driver` 的 `22c0556`，使用 [GofranChang/analog-matrix-module](https://github.com/GofranChang/analog-matrix-module) fork 的 `codex/fix-ec-power` 分支，固定提交 `fcaafdf866c3f89faa2cc3c8e8aac6bb98f0eaa7`（基于上游 `a2c73edfcee7d7e626d323982b14dcd1e2b88332`）。使用其中的 EC 驱动，ZMK 保持 v0.3（Zephyr v3.5.0+zmk-fixes）。上游仅支持 Zephyr 4.1 及更早版本，不要单独升级到移除 KSCAN API 的 Zephyr 版本。
 
 保留当前左右 GPIO、MUX 通道顺序、ADC、屏幕、34 键 Miryoku、矩阵变换、左半 Studio，以及 15 分钟深度睡眠。左右半都保留正常键盘功能、USB 校准 Shell 和串口。
 
@@ -22,6 +22,7 @@ GPIO、MUX 通道、ADC、触发比例、10/30/3000 ms 扫描间隔和 15 分钟
 
 1. 每次扫描上电后的 2000 µs 等待由 CPU 忙等改为线程睡眠；微秒级充放电/ADC 稳定时间仍保持忙等。
 2. 停扫描/设备休眠时先取得扫描互斥锁，等待正在执行的扫描结束，再挂起线程并显式关闭矩阵电源，避免挂起恰好发生在供电期间而留下模拟电路常开。校准长时间占用锁时，等待超过一秒返回错误，由 ZMK 取消这次休眠。
+3. Tako 的 74HC4051 与 OPA350 共用扫描 POWER；新驱动原本在断电后保留 MUX E 与选择脚的高电平，存在通过输入钳位二极管供电的路径。`power-off-gpios` 在关闭 POWER 前将 E/S0/S1/S2 置为物理低电平，恢复旧驱动的断电状态。左侧使用 10/21/20/18，右侧使用 4/9/8/7；E 的配置仍为 GPIO_ACTIVE_LOW，拉低使用 raw GPIO 操作，不改变正常扫描极性。
 
 `config/west.yml` 指向 `GofranChang/analog-matrix-module` 并固定上述提交；ZMK 仍为 v0.3。`build.yaml` 无需额外模块参数，已删除本地 `config/analog_power` 和构建时源码替换逻辑。
 
@@ -29,7 +30,7 @@ GPIO、MUX 通道、ADC、触发比例、10/30/3000 ms 扫描间隔和 15 分钟
 
 共享功能保留 `CONFIG_ZMK_ANALOG_MATRIX_SETTINGS`、`CONFIG_ZMK_ANALOG_MATRIX_DYNAMIC_POLL_RATE` 和放电引脚输入/输出模拟开关。固定版本 EC 源码仍用旧 `CONFIG_ZMK_KSCAN_EC_MATRIX_DYNAMIC_POLL_RATE` 宏初始化动态扫描字段，因此继续同时保留新旧开关。
 
-以上修复针对已确认的源码差异和休眠断电风险；耗电量及休眠是否真正生效仍需实机验证。观察右半关屏/断开后是否必须按 reset 才能恢复；关屏本身不能证明进入深度睡眠。电池百分比也不等同于精确的电流测量。
+硬件依据：[Tako rev1 原理图](https://github.com/ssbb/tako/blob/main/rev1/pcb/tako.kicad_sch)和 [Nexperia 74HC4051 输入钳位说明](https://www.nexperia.com/product/74HC4051D)。以上修复针对已确认的源码差异及断电后输入高电平风险；耗电量及休眠是否真正生效仍需实机验证。观察右半关屏/断开后是否必须按 reset 才能恢复；关屏本身不能证明进入深度睡眠。电池百分比也不等同于精确的电流测量。
 
 ## 首次刷入与校准
 

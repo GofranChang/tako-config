@@ -11,6 +11,6 @@ manifest:
       import: app/west.yml
     - name: analog-matrix-module
       remote: gofran
-      revision: c297ab16333262c51d881536322734bc5080469f
+      revision: fcaafdf866c3f89faa2cc3c8e8aac6bb98f0eaa7
   self:
     path: config

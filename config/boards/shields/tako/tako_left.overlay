@@ -39,6 +39,12 @@
     idle-after-secs = <5>;
     sleep-after-secs = <900>;
     io-channels = <&adc 1>;
+    /* MUX VCC shares matrix POWER. Park E and S0/S1/S2 physically low
+     * before cutting POWER, matching the original Tako driver. */
+    power-off-gpios = <&pro_micro 10 GPIO_ACTIVE_LOW>,
+      <&pro_micro 21 GPIO_ACTIVE_HIGH>,
+      <&pro_micro 20 GPIO_ACTIVE_HIGH>,
+      <&pro_micro 18 GPIO_ACTIVE_HIGH>;
     power-gpios = <&pro_micro 15 GPIO_ACTIVE_HIGH>;
   };
   ec_mux: ec_mux {
