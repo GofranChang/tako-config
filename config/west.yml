@@ -4,12 +4,15 @@ manifest:
       url-base: https://github.com/zmkfirmware
     - name: gofran
       url-base: https://github.com/GofranChang
+    - name: gofran-gitee
+      url-base: https://gitee.com/gofranchang
     - name: englmaxi
       url-base: https://github.com/englmaxi
   projects:
     - name: zmk
-      remote: zmkfirmware
-      revision: v0.3
+      repo-path: zmks
+      remote: gofran-gitee
+      revision: 06ac84443992c0931b77301eae220dd44bf32feb
       import: app/west.yml
     - name: analog-matrix-module
       remote: gofran

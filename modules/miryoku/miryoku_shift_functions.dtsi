@@ -17,11 +17,20 @@
 U_MACRO(u_macro_ ## NAME, wait-ms = <0>; bindings = <SHIFT_BINDING>;) \
 MIRYOKU_SHIFT_FUNCTION(NAME, BINDING, &u_macro_ ## NAME)
 
+#if defined(CONFIG_ZMK_SPLIT_ESB)
+// ESB-only mode has no host Bluetooth profiles.
+MIRYOKU_SHIFT_MACRO(u_bt_sel_0, &none, &none)
+MIRYOKU_SHIFT_MACRO(u_bt_sel_1, &none, &none)
+MIRYOKU_SHIFT_MACRO(u_bt_sel_2, &none, &none)
+MIRYOKU_SHIFT_MACRO(u_bt_sel_3, &none, &none)
+MIRYOKU_SHIFT_MACRO(u_bt_sel_4, &none, &none)
+#else
 MIRYOKU_SHIFT_MACRO(u_bt_sel_0, &bt BT_SEL 0, &bt BT_SEL 0 &bt BT_CLR)
 MIRYOKU_SHIFT_MACRO(u_bt_sel_1, &bt BT_SEL 1, &bt BT_SEL 1 &bt BT_CLR)
 MIRYOKU_SHIFT_MACRO(u_bt_sel_2, &bt BT_SEL 2, &bt BT_SEL 2 &bt BT_CLR)
 MIRYOKU_SHIFT_MACRO(u_bt_sel_3, &bt BT_SEL 3, &bt BT_SEL 3 &bt BT_CLR)
 MIRYOKU_SHIFT_MACRO(u_bt_sel_4, &bt BT_SEL 4, &bt BT_SEL 4 &bt BT_CLR)
+#endif
 
 MIRYOKU_SHIFT_FUNCTION(u_out_tog, &out OUT_TOG, &out OUT_USB)
 
