@@ -1,7 +1,11 @@
-if SHIELD_TAKO_DONGLE
+if SHIELD_TAKO_DONGLE || SHIELD_TAKO_LEFT
 
 config ZMK_KEYBOARD_NAME
   default "Tako"
+
+endif
+
+if SHIELD_TAKO_DONGLE
 
 config ZMK_SPLIT_ROLE_CENTRAL
   default y
