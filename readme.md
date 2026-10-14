@@ -1,65 +1,76 @@
-# Tako ZMK — Analog Matrix EC 驱动
+# Tako ZMK — nice!nano OLED dongle
 
-本分支基于 `pete_driver` 的 `22c0556`，使用 [GofranChang/analog-matrix-module](https://github.com/GofranChang/analog-matrix-module) fork 的 `codex/fix-ec-power` 分支，固定提交 `fcaafdf866c3f89faa2cc3c8e8aac6bb98f0eaa7`（基于上游 `a2c73edfcee7d7e626d323982b14dcd1e2b88332`）。使用其中的 EC 驱动，ZMK 保持 v0.3（Zephyr v3.5.0+zmk-fixes）。上游仅支持 Zephyr 4.1 及更早版本，不要单独升级到移除 KSCAN API 的 Zephyr 版本。
+本分支 `codex/tako-dongle` 从稳定标签 `tako-analog-stable-2026-10-14`（`c262ce2`）创建。dongle 硬件与 [TOTEM feature/dongle_miryoku](https://github.com/GofranChang/zmk-config-totem/tree/feature/dongle_miryoku) 完全相同：nice!nano + I²C SH1106 128×64 OLED。
 
-保留当前左右 GPIO、MUX 通道顺序、ADC、屏幕、34 键 Miryoku、矩阵变换、左半 Studio，以及 15 分钟深度睡眠。左右半都保留正常键盘功能、USB 校准 Shell 和串口。
+## 连接方式
 
-## nice!view 数字电量显示
+```text
+Tako 左半（BLE peripheral） ─┐
+                           ├── nice!nano dongle（central）── USB ── 电脑
+Tako 右半（BLE peripheral） ─┘
+```
 
-显示配置参考 [zmk-config-for-temperwenwan 的 wenwan.conf](https://github.com/GofranChang/zmk-config-for-temperwenwan/blob/main/config/wenwan.conf)：使用 ZMK 内置状态屏，启用 `CONFIG_ZMK_WIDGET_BATTERY_STATUS_SHOW_PERCENTAGE=y`，默认字体和小字体均为 Montserrat 26。左右屏分别显示本半电池的数字百分比。
+- dongle 是唯一主控，最多连接两半；Studio、Miryoku 层和按键处理在 dongle 上运行。主机蓝牙配置也属于 dongle。
+- 左右半均为无线外围设备。把左半 USB 接电脑可以充电和校准，但键盘输入仍经 dongle；要恢复左半有线主控方案，请切回稳定标签并刷回两半固件。
+- 两半保留 nice!view 数字电量、独立 USB 校准 Shell、原有 GPIO / MUX / ADC、50% 触发值、10/30 ms 扫描、矩阵断电 GPIO 停泊修复和 15 分钟深度睡眠。睡眠后按各半实体 reset 重启。
+- 两半的空闲时间分别计算：只用一侧打字，另一侧仍可能在 15 分钟后深度睡眠。
+- dongle 没有 EC 矩阵，使用 mock kscan；与两半共用同一份 34 键物理布局及矩阵映射，右侧保留 col-offset=5。USB 接通的 dongle 不进入深度睡眠。
 
-参考仓库的 `build.yaml` 使用 `nice_view_custom` 名称，但该 shield 没有出现在该仓库或官方 ZMK v0.3 中。因此 Tako 使用官方支持的 `nice_view` shield，配合上述内置状态屏配置实现相同的电量显示方式，不再使用 Elemental。无需第三方显示模块，也不需要修改 nice!view SPI 线路：SCK P0.20、MOSI P0.17，左 CS P0.11、右 CS P0.09。
+## OLED 与依赖
 
-本次仅迁移显示方案；EC 驱动固定版本、触发值、校准 Shell/串口、Studio、蓝牙和休眠参数保持原配置。百分比仍来自 ZMK 的电量估算，显示数字不会提高测量精度。
+OLED 配置逐项参照 TOTEM 的 `totem_dongle.overlay`：`pro_micro_i2c`（nice!nano SDA=P0.17、SCL=P0.20）、地址 0x3c、SH1106、128×64、segment-offset=2、multiplex-ratio=63、segment-remap、com-invdir、prechargep=0x22。电源接法沿用同款硬件。
 
-## 日常省电与构建配置
+dongle 使用 `englmaxi/zmk-dongle-display` 的 v0.3 兼容提交 `c6c4be11c5ede722086a2a1f355cec9c101b9390`，提供两半数字电量、层、连接、修饰键和猫动画等状态。电量来源编号按外围设备的配对槽位确定；首次配对先启动左半，再启动右半。
 
-为确认耗电原因，当前保留与 `codex/analog-matrix-driver` 一致的左右校准 Shell、USB CDC、详细校准功能，以及左半 Studio，不再区分日常和校准固件。构建继续使用上游 `zmk-analog-matrix-calibrator` snippet，由 fork 中的 C 驱动直接提供下述电源修复。**不要刷 settings_reset**，已有校准数据继续使用。
+ZMK 保持 v0.3，因此 board 名仍为 `nice_nano_v2`，没有照搬新版 `nice_nano//zmk`。analog-matrix-module 固定 `3cb997880834b7147f96107d7564840f0013af1c`，保留已验证的功耗和闲置响应修复。参考仓库的 `zmk-nice-oled` 没有用于 dongle 构建，本分支不添加该无关依赖。
 
-GPIO、MUX 通道、ADC、触发比例、10/30/3000 ms 扫描间隔和 15 分钟深度睡眠参数保持一致。
+## 编译与固件
 
-电源修复直接提交在 fork 的 `drivers/kscan/zmk_kscan_ec_matrix.c` 和 `zmk_analog_matrix.c` 中：
+GitHub Actions 读取 `build.yaml`，生成左半、右半、dongle 和 settings_reset。远程构建前，须先将驱动仓库的固定提交推送到 GitHub，再推送本配置分支。
 
-1. 每次扫描上电后的 2000 µs 等待由 CPU 忙等改为线程睡眠；微秒级充放电/ADC 稳定时间仍保持忙等。
-2. 停扫描/设备休眠时先取得扫描互斥锁，等待正在执行的扫描结束，再挂起线程并显式关闭矩阵电源，避免挂起恰好发生在供电期间而留下模拟电路常开。校准长时间占用锁时，等待超过一秒返回错误，由 ZMK 取消这次休眠。
-3. Tako 的 74HC4051 与 OPA350 共用扫描 POWER；新驱动原本在断电后保留 MUX E 与选择脚的高电平，存在通过输入钳位二极管供电的路径。`power-off-gpios` 在关闭 POWER 前将 E/S0/S1/S2 置为物理低电平，恢复旧驱动的断电状态。左侧使用 10/21/20/18，右侧使用 4/9/8/7；E 的配置仍为 GPIO_ACTIVE_LOW，拉低使用 raw GPIO 操作，不改变正常扫描极性。
+已配置的本地环境：
 
-`config/west.yml` 指向 `GofranChang/analog-matrix-module` 并固定上述提交；ZMK 仍为 v0.3。`build.yaml` 无需额外模块参数，已删除本地 `config/analog_power` 和构建时源码替换逻辑。
+```sh
+cd /Users/gofran/Documents/workspace/keyboard/zmk-local
+./build-tako.sh all       # 两半 + dongle
+./build-tako.sh both      # 仅两半
+./build-tako.sh dongle    # 仅 dongle
+./build-tako.sh reset     # 仅 settings_reset
+```
 
-远程构建前先将 fork 的 `codex/fix-ec-power` 分支推送到 GitHub，让 west 能获取固定提交，再推送 Tako 配置触发构建。手动构建正常运行 `west update`，两半保留 `-S zmk-analog-matrix-calibrator`，左侧另保留 Studio snippet。独立 Shell CDC overlay 继续位于 `tako.dtsi`。
+本地 dongle 模式固件使用单独文件名，避免覆盖稳定版测试文件：`firmware/tako_left-dongle-mode.uf2`、`tako_right-dongle-mode.uf2`、`tako_dongle-dongle-mode.uf2`。两半只启用 calibrator snippet；dongle 只启用 Studio snippet，没有 EC 校准端口。
 
-共享功能保留 `CONFIG_ZMK_ANALOG_MATRIX_SETTINGS`、`CONFIG_ZMK_ANALOG_MATRIX_DYNAMIC_POLL_RATE` 和放电引脚输入/输出模拟开关。固定版本 EC 源码仍用旧 `CONFIG_ZMK_KSCAN_EC_MATRIX_DYNAMIC_POLL_RATE` 宏初始化动态扫描字段，因此继续同时保留新旧开关。
+## 首次迁移与配对
 
-硬件依据：[Tako rev1 原理图](https://github.com/ssbb/tako/blob/main/rev1/pcb/tako.kicad_sch)和 [Nexperia 74HC4051 输入钳位说明](https://www.nexperia.com/product/74HC4051D)。以上修复针对已确认的源码差异及断电后输入高电平风险；耗电量及休眠是否真正生效仍需实机验证。观察右半关屏/断开后是否必须按 reset 才能恢复；关屏本身不能证明进入深度睡眠。电池百分比也不等同于精确的电流测量。
+**不要对两半直接刷 settings_reset：它会擦除 EC 校准数据。** 以下迁移没有更改 EC 校准存储路径。
 
-## 首次刷入与校准
+1. 切换前分别用 USB 连接两半，运行 `ec KSCAN calibration export`，保存一份现有校准备份。
+2. 编译临时解绑固件：`./build-tako.sh all --clear-bonds`。它使用 `CONFIG_ZMK_BLE_CLEAR_BONDS_ON_START=y`，只删除蓝牙绑定及 ZMK 的主机/外围地址记录，不清除 EC 校准数据；输出名带 `-clear-bonds.uf2`。本地固件目录已提供这三份临时固件。
+3. 三个设备分别刷入对应的临时解绑固件，退出 UF2 引导模式后让它正常启动几秒。该临时固件每次启动都会清绑定，不能留作日常使用。
+4. 再执行 `./build-tako.sh all`，给三个设备刷入对应的正常 `-dongle-mode.uf2` 固件。新固件仍可保留当前校准值，无需重做校准。
+5. 关闭两半，dongle 接电脑；先启动左半并测试按键，再启动右半并测试。之后正常使用会自动重连。
+6. 如果 dongle 原本刷的是另一把键盘且存在 Studio 改键数据，可以仅对 dongle 使用 settings_reset，再刷回 dongle 固件；它不存储两半的 EC 校准数据。settings_reset 是清空设置的固件，不是日常键盘固件。
 
-新模块把 Flash 路径从 `zmk/ec/calibration/KSCAN` 改为 `zmk/ec/cal/KSCAN`，旧数据不会自动加载。刷入新固件后，两半都需重新校准和保存。切换前可以用旧固件导出一份校准备份；不必为迁移刷 `settings_reset`。
+之后仅更新固件通常无需再次清绑定。需要回到稳定版本时，切回标签后重编译两半；主从关系再次改变时也需要重新配对。
 
-1. 通过 GitHub Actions 构建并给每半刷入对应 UF2；该固件同时支持键盘使用和 USB 校准。
-2. 用 USB 直接连接要校准的半边。串口波特率为 115200；左半有 Studio 与校准两个 CDC 端口，选择有 Shell 提示符的那个。
-3. 输入 `ec` 查看矩阵名；通常为 `KSCAN`。
-4. 输入 `ec KSCAN calibration start`。低值采样时全部松开；高值采样时逐颗按到底并保持，收到该键完成提示后松开，共 17 颗。
-5. 出现 `Calibration complete!` 后，输入 `ec KSCAN calibration save`。上游没有明确的 Flash 写入成功回执，需检查日志、重启后读取并验证按键。
-6. 输入 `ec KSCAN calibration export` 可导出两组 DTS 数组；`ec KSCAN calibration load` 可读取新路径保存的数据。两组数组仍各 20 项，按行排列，每行 5 列。
-7. 左右半分别进行以上操作，无需在校准后切换固件。即使日常使用 dongle，校准也要直接连接左右半的 USB。
+## 校准与数字电量
 
-**逐键日志坐标改为 `(MUX 列索引, strobe 行索引)`，旧驱动为 `(行,列)`。** 使用配套上位机时选择 `analog-matrix（新分支）` 协议；直接使用旧解析方式会导致进度图错位。Shell 命令与 DTS 数组顺序保持一致。
+日常只将 dongle 插电脑。校准时需要 USB **直接连接待校准的半边**，dongle 不转发校准串口。两半各只有校准 Shell CDC；Studio 在 dongle 上。
 
-固定版本的新 EC 校准器要求按压读数至少达到 `avg_low + 128`（10 位 ADC 的半量程除以 4），不再固定要求绝对读数达到 512。校准时仍应充分按到底。
+```text
+ec
+ec KSCAN calibration start
+ec KSCAN calibration save
+ec KSCAN calibration export
+ec KSCAN calibration load
+```
 
-## 触发与休眠
+开始校准后低值采样时全部松开；高值采样时逐颗按到底并保持，收到完成提示后松开，共 17 颗。完成后 save，重启读取并测试。Flash 路径仍为 `zmk/ec/cal/KSCAN`；坐标是 `(MUX 列索引, strobe 行索引)`，两组数组各 20 项。配套上位机选择 analog-matrix 协议。
 
-`trigger-percentage = <50>` 为每键校准范围中点。上游计算原始触发值为 `high - max(range × percentage / 100, noise)`；增大 percentage 会降低原始触发阈值。释放滞回由范围和噪声决定。
+nice!view 使用 ZMK 内置状态屏和 Montserrat 26 数字百分比。电量仍是电压估算，并非电流或精确容量测量。左右屏不显示 dongle 上的实时层状态；层状态请看 dongle OLED。
 
-保留 10 ms 活动扫描、30 ms 空闲扫描、3000 ms 慢速扫描和 2 ms 上电等待。ZMK 在 15 分钟无操作后深度睡眠；睡眠时停止扫描，按各半实体 reset 重启，启动时加载新路径下的校准数据。没有 ADXL362，保持 `CONFIG_SLEEP_AWAKE_TRIGGER=n`。
+## 验证范围
 
-`settings_reset` 和清除设置的键位会擦除校准数据，使用后需重新校准。
+本地已编译通过三个正常目标、三个临时解绑目标和 settings_reset。已核对最终 Kconfig：只有 dongle 为 central、连接两半且启用 Studio；两半为 peripheral、保留 USB 校准。通过 EDT 对比确认两半 EC / MUX 全部属性与稳定固件一致，三台的 34 键矩阵映射一致，右半 col-offset=5；dongle 为 mock kscan + SH1106 128×64，没有 EC 矩阵。正常版关闭启动清绑定，临时版打开。
 
-## 回退
-
-回到 `pete_driver`，构建并刷入旧模块固件。旧路径中的校准数据在未清除设置时仍保留；如旧固件无法恢复按键，重新校准旧驱动。双方的 Flash 校准路径独立。
-
-## Idle key response (2026-10-13)
-
-Both halves keep the 30 ms idle scan interval until ZMK actually suspends the device, instead of entering a 3000 ms scan interval after 15 minutes without local key events. The analog driver switches to the 10 ms active interval on the first raw press, while retaining two-sample press confirmation. Matrix power-off GPIO parking and 15-minute ZMK deep sleep are retained. Left-hand activity does not reset the right matrix driver’s local idle timer.
+尚未进行实机蓝牙配对、OLED 方向和休眠续航测试；本地编译通过不能代替这些验证。

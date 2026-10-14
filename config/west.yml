@@ -4,6 +4,8 @@ manifest:
       url-base: https://github.com/zmkfirmware
     - name: gofran
       url-base: https://github.com/GofranChang
+    - name: englmaxi
+      url-base: https://github.com/englmaxi
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -12,5 +14,8 @@ manifest:
     - name: analog-matrix-module
       remote: gofran
       revision: 3cb997880834b7147f96107d7564840f0013af1c
+    - name: zmk-dongle-display
+      remote: englmaxi
+      revision: c6c4be11c5ede722086a2a1f355cec9c101b9390 # v0.3-compatible display
   self:
     path: config

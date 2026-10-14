@@ -1,4 +1,4 @@
-if SHIELD_TAKO_LEFT
+if SHIELD_TAKO_DONGLE
 
 config ZMK_KEYBOARD_NAME
   default "Tako"
@@ -8,12 +8,16 @@ config ZMK_SPLIT_ROLE_CENTRAL
 
 endif
 
-if SHIELD_TAKO_LEFT || SHIELD_TAKO_RIGHT
+if SHIELD_TAKO_LEFT || SHIELD_TAKO_RIGHT || SHIELD_TAKO_DONGLE
 
 config ZMK_SPLIT
   default y
 
+endif
+
+if SHIELD_TAKO_LEFT || SHIELD_TAKO_RIGHT
+
 config I2C
-    default n
+  default n
 
 endif

@@ -3,3 +3,6 @@ config SHIELD_TAKO_LEFT
 
 config SHIELD_TAKO_RIGHT
   def_bool $(shields_list_contains,tako_right)
+
+config SHIELD_TAKO_DONGLE
+  def_bool $(shields_list_contains,tako_dongle)
