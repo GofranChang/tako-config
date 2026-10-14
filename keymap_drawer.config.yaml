@@ -1,0 +1,127 @@
+draw_config:
+  n_columns: 2
+  key_w: 60
+  key_h: 56
+  combo_w: 36
+  combo_h: 30
+  shrink_wide_legends: 6
+parse_config:
+  raw_binding_map:
+    '&bootloader': BOOT
+    '&caps_word': CAPS WORD
+    '&mkp MB1': Mouse 1
+    '&mkp MB2': Mouse 2
+    '&mkp MB3': Mouse 3
+    '&mmv MOVE_LEFT': Mouse L
+    '&mmv MOVE_RIGHT': Mouse R
+    '&mmv MOVE_UP': Mouse U
+    '&mmv MOVE_DOWN': Mouse D
+    '&msc SCRL_LEFT': Scroll L
+    '&msc SCRL_RIGHT': Scroll R
+    '&msc SCRL_UP': Scroll U
+    '&msc SCRL_DOWN': Scroll D
+    '&u_to_U_BASE':
+      t: Base
+      h: 2x
+    '&u_to_U_EXTRA':
+      t: Extra
+      h: 2x
+    '&u_to_U_TAP':
+      t: Tap
+      h: 2x
+    '&u_to_U_BUTTON':
+      t: Button
+      h: 2x
+    '&u_to_U_NAV':
+      t: Nav
+      h: 2x
+    '&u_to_U_MOUSE':
+      t: Mouse
+      h: 2x
+    '&u_to_U_MEDIA':
+      t: Media
+      h: 2x
+    '&u_to_U_NUM':
+      t: Num
+      h: 2x
+    '&u_to_U_SYM':
+      t: Sym
+      h: 2x
+    '&u_to_U_FUN':
+      t: Fun
+      h: 2x
+    '&u_macro_u_bt_sel_0': Clear BT0
+    '&u_macro_u_bt_sel_1': Clear BT1
+    '&u_macro_u_bt_sel_2': Clear BT2
+    '&u_macro_u_bt_sel_3': Clear BT3
+    '&u_macro_u_bt_sel_4': Clear BT4
+  zmk_keycode_map:
+    EXCLAMATION: '!'
+    EXCL: '!'
+    AT_SIGN: '@'
+    AT: '@'
+    HASH: '#'
+    POUND: '#'
+    DOLLAR: $
+    DLLR: $
+    PERCENT: '%'
+    PRCNT: '%'
+    CARET: ^
+    AMPERSAND: '&'
+    AMPS: '&'
+    ASTERISK: '*'
+    ASTRK: '*'
+    STAR: '*'
+    LEFT_PARENTHESIS: (
+    LPAR: (
+    RIGHT_PARENTHESIS: )
+    RPAR: )
+    EQUAL: '='
+    PLUS: +
+    MINUS: '-'
+    UNDERSCORE: _
+    UNDER: _
+    SLASH: /
+    FSLH: /
+    QUESTION: '?'
+    QMARK: '?'
+    BACKSLASH: \
+    BSLH: \
+    PIPE: '|'
+    NON_US_BACKSLASH: \
+    PIPE2: '|'
+    NON_US_BSLH: '|'
+    SEMICOLON: ;
+    SEMI: ;
+    COLON: ':'
+    SINGLE_QUOTE: ''''
+    SQT: ''''
+    APOSTROPHE: ''''
+    APOS: ''''
+    DOUBLE_QUOTES: '"'
+    DQT: '"'
+    COMMA: ','
+    LESS_THAN: <
+    LT: <
+    PERIOD: .
+    DOT: .
+    GREATER_THAN: '>'
+    GT: '>'
+    LEFT_BRACKET: '['
+    LBKT: '['
+    LEFT_BRACE: '{'
+    LBRC: '{'
+    RIGHT_BRACKET: ']'
+    RBKT: ']'
+    RIGHT_BRACE: '}'
+    RBRC: '}'
+    GRAVE: '`'
+    TILDE: '~'
+    NON_US_HASH: '#'
+    NUHS: '#'
+    TILDE2: '~'
+    LGUI: GUI
+    LALT: Alt
+    RALT: AltGr
+    LCTRL: Ctrl
+    LSHFT: Shift

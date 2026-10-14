@@ -1,0 +1,531 @@
+layout:
+  dts_layout: config/boards/shields/tako/tako-layouts.dtsi
+layers:
+  Base:
+  - Q
+  - W
+  - E
+  - R
+  - T
+  - Y
+  - U
+  - I
+  - O
+  - P
+  - t: A
+    h: GUI
+  - t: S
+    h: Alt
+  - t: D
+    h: Ctrl
+  - t: F
+    h: Shift
+  - G
+  - H
+  - t: J
+    h: Shift
+  - t: K
+    h: Ctrl
+  - t: L
+    h: Alt
+  - t: ''''
+    h: GUI
+  - t: Z
+    h: Button
+  - t: X
+    h: AltGr
+  - C
+  - V
+  - B
+  - N
+  - M
+  - ','
+  - t: .
+    h: AltGr
+  - t: /
+    h: Button
+  - t: SPACE
+    h: Nav
+  - t: TAB
+    h: Mouse
+  - t: RET
+    h: Sym
+  - t: BSPC
+    h: Num
+  Extra:
+  - Q
+  - W
+  - E
+  - R
+  - T
+  - Y
+  - U
+  - I
+  - O
+  - P
+  - t: A
+    h: GUI
+  - t: S
+    h: Alt
+  - t: D
+    h: Ctrl
+  - t: F
+    h: Shift
+  - G
+  - H
+  - t: J
+    h: Shift
+  - t: K
+    h: Ctrl
+  - t: L
+    h: Alt
+  - t: ''''
+    h: GUI
+  - t: Z
+    h: Button
+  - t: X
+    h: AltGr
+  - C
+  - V
+  - B
+  - N
+  - M
+  - ','
+  - t: .
+    h: AltGr
+  - t: /
+    h: Button
+  - t: SPACE
+    h: Nav
+  - t: TAB
+    h: Mouse
+  - t: RET
+    h: Sym
+  - t: BSPC
+    h: Num
+  Tap:
+  - Q
+  - W
+  - F
+  - P
+  - B
+  - J
+  - L
+  - U
+  - Y
+  - ''''
+  - A
+  - R
+  - S
+  - T
+  - G
+  - M
+  - N
+  - E
+  - I
+  - O
+  - Z
+  - X
+  - C
+  - D
+  - V
+  - K
+  - H
+  - ','
+  - .
+  - /
+  - SPACE
+  - TAB
+  - RET
+  - BSPC
+  Button:
+  - UNDO
+  - Sft+DEL
+  - Ctl+INS
+  - Sft+INS
+  - AGAIN
+  - AGAIN
+  - Sft+INS
+  - Ctl+INS
+  - Sft+DEL
+  - UNDO
+  - GUI
+  - Alt
+  - Ctrl
+  - Shift
+  - ''
+  - ''
+  - Shift
+  - Ctrl
+  - Alt
+  - GUI
+  - t: UNDO
+    type: held
+  - Sft+DEL
+  - Ctl+INS
+  - Sft+INS
+  - AGAIN
+  - AGAIN
+  - Sft+INS
+  - Ctl+INS
+  - Sft+DEL
+  - UNDO
+  - Mouse 1
+  - Mouse 2
+  - Mouse 2
+  - Mouse 1
+  Nav:
+  - BOOT
+  - t: Tap
+    h: 2x
+  - t: Extra
+    h: 2x
+  - t: Base
+    h: 2x
+  - ''
+  - AGAIN
+  - Sft+INS
+  - Ctl+INS
+  - Sft+DEL
+  - UNDO
+  - GUI
+  - Alt
+  - Ctrl
+  - Shift
+  - ''
+  - LEFT
+  - DOWN
+  - UP
+  - RIGHT
+  - t: CAPS WORD
+    s: CAPS
+  - ''
+  - AltGr
+  - t: Num
+    h: 2x
+  - t: Nav
+    h: 2x
+  - ''
+  - HOME
+  - PG DN
+  - PG UP
+  - END
+  - INS
+  - type: held
+  - ''
+  - RET
+  - BSPC
+  Mouse:
+  - BOOT
+  - t: Tap
+    h: 2x
+  - t: Extra
+    h: 2x
+  - t: Base
+    h: 2x
+  - ''
+  - AGAIN
+  - Sft+INS
+  - Ctl+INS
+  - Sft+DEL
+  - UNDO
+  - GUI
+  - Alt
+  - Ctrl
+  - Shift
+  - ''
+  - Mouse L
+  - Mouse D
+  - Mouse U
+  - Mouse R
+  - ''
+  - ''
+  - AltGr
+  - t: Sym
+    h: 2x
+  - t: Mouse
+    h: 2x
+  - ''
+  - Scroll L
+  - Scroll D
+  - Scroll U
+  - Scroll R
+  - ''
+  - ''
+  - type: held
+  - Mouse 2
+  - Mouse 1
+  Media:
+  - BOOT
+  - t: Tap
+    h: 2x
+  - t: Extra
+    h: 2x
+  - t: Base
+    h: 2x
+  - ''
+  - RGB EFF
+  - RGB HUI
+  - RGB SAI
+  - RGB BRI
+  - RGB TOG
+  - GUI
+  - Alt
+  - Ctrl
+  - Shift
+  - ''
+  - PREV
+  - VOL DN
+  - VOL UP
+  - NEXT
+  - EP TOG
+  - ''
+  - AltGr
+  - t: Fun
+    h: 2x
+  - t: Media
+    h: 2x
+  - ''
+  - t: BT
+    h: '0'
+    s: Clear BT0
+  - t: BT
+    h: '1'
+    s: Clear BT1
+  - t: BT
+    h: '2'
+    s: Clear BT2
+  - t: BT
+    h: '3'
+    s: Clear BT3
+  - t: OUT TOG
+    s: OUT USB
+  - type: held
+  - type: held
+  - STOP
+  - PP
+  Num:
+  - '['
+  - '7'
+  - '8'
+  - '9'
+  - ']'
+  - ''
+  - t: Base
+    h: 2x
+  - t: Extra
+    h: 2x
+  - t: Tap
+    h: 2x
+  - BOOT
+  - ;
+  - '4'
+  - '5'
+  - '6'
+  - '='
+  - ''
+  - Shift
+  - Ctrl
+  - Alt
+  - GUI
+  - '`'
+  - '1'
+  - '2'
+  - '3'
+  - \
+  - ''
+  - t: Num
+    h: 2x
+  - t: Nav
+    h: 2x
+  - AltGr
+  - ''
+  - '0'
+  - '-'
+  - ''
+  - type: held
+  Sym:
+  - '{'
+  - '&'
+  - '*'
+  - (
+  - '}'
+  - ''
+  - t: Base
+    h: 2x
+  - t: Extra
+    h: 2x
+  - t: Tap
+    h: 2x
+  - BOOT
+  - ':'
+  - $
+  - '%'
+  - ^
+  - +
+  - ''
+  - Shift
+  - Ctrl
+  - Alt
+  - GUI
+  - '~'
+  - '!'
+  - '@'
+  - '#'
+  - '|'
+  - ''
+  - t: Sym
+    h: 2x
+  - t: Mouse
+    h: 2x
+  - AltGr
+  - ''
+  - )
+  - _
+  - type: held
+  - ''
+  Fun:
+  - F12
+  - F7
+  - F8
+  - F9
+  - PSCRN
+  - ''
+  - t: Base
+    h: 2x
+  - t: Extra
+    h: 2x
+  - t: Tap
+    h: 2x
+  - BOOT
+  - F11
+  - F4
+  - F5
+  - F6
+  - SLCK
+  - ''
+  - Shift
+  - Ctrl
+  - Alt
+  - GUI
+  - F10
+  - F1
+  - F2
+  - F3
+  - PAUSE BREAK
+  - ''
+  - t: Fun
+    h: 2x
+  - t: Media
+    h: 2x
+  - AltGr
+  - ''
+  - SPACE
+  - TAB
+  - type: held
+  - type: held
+combos:
+- p:
+  - 30
+  - 31
+  k:
+    t: ESC
+    h: Media
+  l:
+  - Base
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k:
+    t: ESC
+    h: Media
+  l:
+  - Extra
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: Mouse 3
+  l:
+  - Button
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: .
+  l:
+  - Num
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: (
+  l:
+  - Sym
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: APP
+  l:
+  - Fun
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k:
+    t: DEL
+    h: Fun
+  l:
+  - Base
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k:
+    t: DEL
+    h: Fun
+  l:
+  - Extra
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: Mouse 3
+  l:
+  - Button
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: DEL
+  l:
+  - Nav
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: Mouse 3
+  l:
+  - Mouse
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: MUTE
+  l:
+  - Media
+  align: bottom
+  offset: 0.5

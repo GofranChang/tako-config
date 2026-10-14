@@ -2,6 +2,42 @@
 
 本分支 `codex/tako-dongle` 从稳定标签 `tako-analog-stable-2026-10-14`（`c262ce2`）创建。dongle 硬件与 [TOTEM feature/dongle_miryoku](https://github.com/GofranChang/zmk-config-totem/tree/feature/dongle_miryoku) 完全相同：nice!nano + I²C SH1106 128×64 OLED。
 
+## Keymap
+
+<!-- keymap:start -->
+
+![Tako Base 层](keymap-drawer/tako-base.svg)
+
+主字为点按，下方为长按；表格中的 `/` 分隔点按与长按。`2x` 表示双击切层；右上角标注为 Shift 功能。组合键框连接的按键需要同时按下。
+
+| 左1 | 左2 | 左3 | 左4 | 左5 | 右1 | 右2 | 右3 | 右4 | 右5 |
+|---|---|---|---|---|---|---|---|---|---|
+| Q | W | E | R | T | Y | U | I | O | P |
+| A / GUI | S / Alt | D / Ctrl | F / Shift | G | H | J / Shift | K / Ctrl | L / Alt | &#x27; / GUI |
+| Z / Button | X / AltGr | C | V | B | N | M | , | . / AltGr | / / Button |
+
+拇指键（左至右）：SPACE / Nav；TAB / Mouse；RET / Sym；BSPC / Num。
+
+共 10 层：Base、Extra、Tap、Button、Nav、Mouse、Media、Num、Sym、Fun。
+
+<details>
+<summary>展开全部层与组合键</summary>
+
+![Tako 全部键位](keymap-drawer/tako.svg)
+
+</details>
+
+<!-- keymap:end -->
+
+键位图由 `.github/workflows/draw_keymap.yaml` 在每次分支 push 后重新生成，有变化时自动提交到同一分支；也可在 Actions 手动运行 **Draw ZMK keymaps**。直接解析 `tako.keymap` 及其包含的 Miryoku 宏，物理布局与固件共用 `tako-layouts.dtsi`。Studio 中保存的动态改键不在仓库里，不会反映到图中。
+
+本地重绘（Python 3.12+）：
+
+```sh
+python -m pip install -r scripts/requirements-keymap.txt
+python scripts/draw_keymap.py
+```
+
 ## 六个编译产物
 
 `build.yaml` 一次固定生成以下六个 UF2；文件名显式区分两套连接方式。
