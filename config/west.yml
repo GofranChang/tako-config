@@ -6,6 +6,8 @@ manifest:
       url-base: https://github.com/GofranChang
     - name: englmaxi
       url-base: https://github.com/englmaxi
+    - name: gpeye
+      url-base: https://github.com/GPeye
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -17,5 +19,8 @@ manifest:
     - name: zmk-dongle-display
       remote: englmaxi
       revision: c6c4be11c5ede722086a2a1f355cec9c101b9390 # v0.3-compatible display
+    - name: hammerbeam-slideshow
+      remote: gpeye
+      revision: 9c16436efa4c87d19e2e4558927969c7ddd5851d
   self:
     path: config

@@ -31,7 +31,13 @@ static void apply_display_policy(struct k_work *work) {
     if (!zmk_display_is_initialized() || !device_is_ready(display)) {
         return;
     }
-    bool awake = zmk_usb_is_powered() || zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE;
+    enum zmk_activity_state activity = zmk_activity_get_state();
+    bool awake = zmk_usb_is_powered() || activity == ZMK_ACTIVITY_ACTIVE;
+#if IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_STATUS) && IS_ENABLED(CONFIG_ZMK_SPLIT) && \
+    !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+    /* Do not pause the 20-second slideshow after the 5-second idle timeout. */
+    awake = awake || activity != ZMK_ACTIVITY_SLEEP;
+#endif
     if (awake) {
 #if DT_HAS_CHOSEN(zmk_display_led)
         led_on(display_led, display_led_idx);
