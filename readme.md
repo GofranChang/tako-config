@@ -77,6 +77,15 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 在两种拓扑间切换不是自动切主：需给左半刷对应角色固件，并清理两端旧蓝牙绑定后重新配对；右半只更新固件不会清除旧绑定。
 
+## 输出切换、屏幕与符号层
+
+- Media 层实体 `/` 键（原 `u_out_tog` 位置）直接切换 USB / 蓝牙输出，按住 Shift 也能切换。先将主设备（dongle 或左主）与目标电脑配对，并选择对应蓝牙配置；蓝牙未连接时，ZMK 会回退到可用的 USB 输出。从设备的 USB 仍用于充电和校准。
+- dongle 的 SH1106 OLED 使用 `inversion-on` 整体翻转原有配色，位图小组件也一起翻转。
+- 所有 Tako 屏幕在 USB 供电时持续显示，即使选择蓝牙输出也不熄屏。插入 USB 会唤醒空闲屏幕，拔掉后恢复按活动状态熄屏；电池供电时，两半空闲 5 秒停止显示刷新；OLED 会熄屏，nice!view 可能保留最后一帧。原有 15 分钟深度睡眠保持不变。
+- Sym 层（长按右侧 Enter 拇指键）：实体 `I` 输出 `Esc`，`,` 输出 `(`，`.` 输出 `)`；Base 层不变。
+- `config/boards/shields/tako/usb_display.c` 统一管理屏幕熄屏，保持 `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n`，避免上游的空闲监听器同时控制屏幕。该实现使用固定 ZMK v0.3 的显示刷新定时器。
+- 主设备上已有的 Studio 动态改键可能覆盖仓库键位；刷机后若按键不一致，请在 Studio 更新对应绑定。
+
 ## OLED 与依赖
 
 OLED 配置逐项参照 TOTEM 的 `totem_dongle.overlay`：`pro_micro_i2c`（nice!nano SDA=P0.17、SCL=P0.20）、地址 0x3c、SH1106、128×64、segment-offset=2、multiplex-ratio=63、segment-remap、com-invdir、prechargep=0x22。电源接法沿用同款硬件。
@@ -134,6 +143,8 @@ ec KSCAN calibration load
 nice!view 使用 ZMK 内置状态屏和 Montserrat 26 数字百分比。电量仍是电压估算，并非电流或精确容量测量。dongle 模式左右屏不显示 dongle 上的实时层状态；层状态请看 dongle OLED。左主右从模式的层状态在左主设备屏幕显示。
 
 ## 验证范围
+
+本次输出切换、Sym 改键和 USB 显示策略修改已进行源码检查及宿主 C 模拟测试（USB 插拔、空闲、睡眠、初始化等待，有/无显示 LED）。当前 WSL 没有 ZMK/Zephyr 工具链，本次修改尚未完整编译或实机验证；下面的六目标编译记录属于此前版本。
 
 六个目标已全部本地编译通过，并核对最终角色分别为：dongle central（连接两半）、左主 central（连接一半）、其余半边 peripheral。两套主设备都启用 Studio，四个半边构建都保留 USB 校准，正常版不在启动时清绑定。两份右侧 UF2 的 SHA-256 相同，二进制完全一致。
 

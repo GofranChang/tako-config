@@ -30,5 +30,7 @@
         segment-remap;
         com-invdir;
         prechargep = <0x22>;
+        /* Flip the entire framebuffer, including bitmap widgets. */
+        inversion-on;
     };
 };

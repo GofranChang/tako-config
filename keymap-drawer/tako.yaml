@@ -298,8 +298,7 @@ layers:
   - t: BT
     h: '3'
     s: Clear BT3
-  - t: OUT TOG
-    s: OUT USB
+  - OUT TOG
   - type: held
   - type: held
   - STOP
@@ -353,8 +352,7 @@ layers:
   - ''
   - t: Base
     h: 2x
-  - t: Extra
-    h: 2x
+  - ESC
   - t: Tap
     h: 2x
   - BOOT
@@ -376,9 +374,8 @@ layers:
   - ''
   - t: Sym
     h: 2x
-  - t: Mouse
-    h: 2x
-  - AltGr
+  - (
+  - )
   - ''
   - )
   - _

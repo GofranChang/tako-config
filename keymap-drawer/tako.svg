@@ -1304,9 +1304,8 @@ path.combo {
 <g transform="translate(644, 193)" class="key keypos-29">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 <text x="0" y="0" class="key tap">
-<tspan x="0" dy="-0.3em">OUT</tspan><tspan x="0" dy="1.2em">TOG</tspan>
+<tspan x="0" dy="-0.6em">OUT</tspan><tspan x="0" dy="1.2em">TOG</tspan>
 </text>
-<text x="0" y="-24" class="key shifted"><tspan style="font-size: 86%">OUT USB</tspan></text>
 </g>
 <g transform="translate(221, 221) rotate(15.0)" class="key held keypos-30">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key held"/>
@@ -1515,9 +1514,7 @@ path.combo {
 </g>
 <g transform="translate(532, 28)" class="key keypos-7">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<a href="#Extra">
-<text x="0" y="0" class="key tap layer-activator">Extra</text>
-</a><text x="0" y="24" class="key hold">2x</text>
+<text x="0" y="0" class="key tap">ESC</text>
 </g>
 <g transform="translate(588, 46)" class="key keypos-8">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -1599,13 +1596,11 @@ path.combo {
 </g>
 <g transform="translate(532, 140)" class="key keypos-27">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<a href="#Mouse">
-<text x="0" y="0" class="key tap layer-activator">Mouse</text>
-</a><text x="0" y="24" class="key hold">2x</text>
+<text x="0" y="0" class="key tap">(</text>
 </g>
 <g transform="translate(588, 157)" class="key keypos-28">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<text x="0" y="0" class="key tap">AltGr</text>
+<text x="0" y="0" class="key tap">)</text>
 </g>
 <g transform="translate(644, 193)" class="key keypos-29">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
