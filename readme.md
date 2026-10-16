@@ -40,7 +40,7 @@ python scripts/draw_keymap.py
 
 ## Win / Mac 模式
 
-开机默认 **WIN**。按住左侧两个拇指键（Space + Tab 的组合键）进入 Media，然后快速双击实体 `T`，切换到 **MAC Base**；在 MAC 模式同样操作可回到 **WIN Base**。单击 T 不切换，双击窗口为 200 ms。切换会回到目标系统的 Base 层，松开拇指后正常输入。模式保留到重启，不写入闪存，也不自动检测操作系统。
+开机默认 **WIN**。按住左侧两个拇指键（Space + Tab 的组合键）进入 Media，然后快速双击实体 `P`，切换到 **MAC Base**；在 MAC 模式同样操作可回到 **WIN Base**。单击 P 不切换，双击窗口为 200 ms。切换会回到目标系统的 Base 层，松开拇指后正常输入。模式保留到重启，不写入闪存，也不自动检测操作系统。
 
 | 操作位置 | WIN | MAC |
 | --- | --- | --- |
@@ -164,7 +164,7 @@ nice!view 使用 [GPeye/hammerbeam-slideshow](https://github.com/GPeye/hammerbea
 
 ## 验证范围
 
-2026-10-16：Win/Mac 版本已在现有 macOS ZMK v0.3 工具链上完成六目标编译：settings_reset、dongle、左从、右从、左主、右外围。两份右侧固件 SHA-256 相同。没有刷写设备。
+2026-10-16：Win/Mac 版本已在现有 macOS ZMK v0.3 工具链上完成六目标编译：settings_reset、dongle、左从、右从、左主、右外围。两份右侧固件 SHA-256 相同。随后将系统切换入口移至 Media 层 P，重新编译 dongle 和左主并通过对应键位检查。没有刷写设备。
 
 对五份实际键盘构建的 `edt.pickle` 运行 `scripts/verify_modes.py`，确认二十层各有 34 个键位、共 24 个拇指组合键；两套 layer-tap / 双击跳层 / 组合键的目标层正确；Ctrl / Command、三处剪贴板层、跳词、行首行尾和双击系统切换均符合模式。键位图生成通过并检查了两套 Base 图。
 

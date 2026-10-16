@@ -250,13 +250,13 @@ layers:
   - '&u_to_U_TAP'
   - '&u_to_U_EXTRA'
   - '&u_to_U_BASE'
-  - t: MAC
-    h: 2x
+  - ''
   - RGB EFF
   - RGB HUI
   - RGB SAI
   - RGB BRI
-  - RGB TOG
+  - t: MAC
+    h: 2x
   - Win
   - Alt
   - Ctrl
@@ -656,13 +656,13 @@ layers:
     h: 2x
   - t: Base
     h: 2x
-  - t: WIN
-    h: 2x
+  - ''
   - RGB EFF
   - RGB HUI
   - RGB SAI
   - RGB BRI
-  - RGB TOG
+  - t: WIN
+    h: 2x
   - Ctrl
   - Alt
   - Cmd
