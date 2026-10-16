@@ -7,8 +7,8 @@ draw_config:
   shrink_wide_legends: 6
 parse_config:
   raw_binding_map:
-    '&tako_to_mac': {t: MAC, h: 2x}
-    '&tako_to_win': {t: WIN, h: 2x}
+    '&to 10': MAC
+    '&to 0': WIN
     '&bootloader': BOOT
     '&caps_word': CAPS WORD
     '&mkp MB1': Mouse 1

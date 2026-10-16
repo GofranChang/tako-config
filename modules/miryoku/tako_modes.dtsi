@@ -33,10 +33,6 @@ MIRYOKU_X(FUN, "WIN Fun")
 #include "miryoku_mousekeys.dtsi"
 #include "miryoku_behaviors.dtsi"
 
-
-MIRYOKU_DOUBLE_TAP_GUARD(tako_to_mac, &to 10)
-MIRYOKU_DOUBLE_TAP_GUARD(tako_to_win, &to 0)
-
 / {
   keymap {
     compatible = "zmk,keymap";
@@ -73,7 +69,7 @@ MIRYOKU_LAYER_LIST
 #undef U_WORD_NEXT
 #define U_WORD_NEXT &kp LA(RIGHT)
 #undef U_OS_SWITCH
-#define U_OS_SWITCH &tako_to_win
+#define U_OS_SWITCH &to 0
 
 #undef U_BASE
 #define U_BASE 10

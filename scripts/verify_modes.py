@@ -73,13 +73,9 @@ def verify(path):
     for index, modifier in ((4, 0x01000000), (14, 0x04000000)):
         assert binding(layers[index], 4) == ('kp', (modifier | KEY | 0x50,))
         assert binding(layers[index], 14) == ('kp', (modifier | KEY | 0x4F,))
-    for index, name, target in ((6, 'tako_to_mac', 10), (16, 'tako_to_win', 0)):
-        assert binding(layers[index], 9)[0] == name
+    for index, target in ((6, 10), (16, 0)):
+        assert binding(layers[index], 9) == ('to', (target,))
         assert binding(layers[index], 4) == ('none', ())
-        guard = edt.get_node('/behaviors/' + name)
-        assert guard.props['tapping-term-ms'].val == 200
-        assert binding(guard, 0)[0] == 'none'
-        assert binding(guard, 1) == ('to', (target,))
         assert binding(layers[index], 29) == ('out', (0,))
 
     combos = edt.get_node('/combos').children

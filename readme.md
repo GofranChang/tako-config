@@ -40,7 +40,7 @@ python scripts/draw_keymap.py
 
 ## Win / Mac 模式
 
-开机默认 **WIN**。按住左侧两个拇指键（Space + Tab 的组合键）进入 Media，然后快速双击实体 `P`，切换到 **MAC Base**；在 MAC 模式同样操作可回到 **WIN Base**。单击 P 不切换，双击窗口为 200 ms。切换会回到目标系统的 Base 层，松开拇指后正常输入。模式保留到重启，不写入闪存，也不自动检测操作系统。
+开机默认 **WIN**。按住左侧两个拇指键（Space + Tab 的组合键）进入 Media，然后单击实体 `P`，切换到 **MAC Base**；在 MAC 模式同样操作可回到 **WIN Base**。切换会回到目标系统的 Base 层，松开拇指后正常输入。模式保留到重启，不写入闪存，也不自动检测操作系统。
 
 | 操作位置 | WIN | MAC |
 | --- | --- | --- |
@@ -164,9 +164,9 @@ nice!view 使用 [GPeye/hammerbeam-slideshow](https://github.com/GPeye/hammerbea
 
 ## 验证范围
 
-2026-10-16：Win/Mac 版本已在现有 macOS ZMK v0.3 工具链上完成六目标编译：settings_reset、dongle、左从、右从、左主、右外围。两份右侧固件 SHA-256 相同。随后将系统切换入口移至 Media 层 P，重新编译 dongle 和左主并通过对应键位检查。没有刷写设备。
+2026-10-16：Win/Mac 版本已在现有 macOS ZMK v0.3 工具链上完成六目标编译：settings_reset、dongle、左从、右从、左主、右外围。两份右侧固件 SHA-256 相同。随后将系统切换入口移至 Media 层 P，重新编译 dongle 和左主并通过对应键位检查；该入口现为单击切换。没有刷写设备。
 
-对五份实际键盘构建的 `edt.pickle` 运行 `scripts/verify_modes.py`，确认二十层各有 34 个键位、共 24 个拇指组合键；两套 layer-tap / 双击跳层 / 组合键的目标层正确；Ctrl / Command、三处剪贴板层、跳词、行首行尾和双击系统切换均符合模式。键位图生成通过并检查了两套 Base 图。
+对五份实际键盘构建的 `edt.pickle` 运行 `scripts/verify_modes.py`，确认二十层各有 34 个键位、共 24 个拇指组合键；两套 layer-tap / 双击跳层 / 组合键的目标层正确；Ctrl / Command、三处剪贴板层、跳词、行首行尾和系统切换均符合模式。键位图生成通过并检查了两套 Base 图。
 
 复查方法（使用本地 Zephyr 的 Python 环境，仅加载自己编译生成的 pickle）：
 
@@ -179,4 +179,4 @@ PYTHONPATH=../zmk-local/zephyr/scripts/dts/python-devicetree/src \
 
 本地若未下载 `hammerbeam-slideshow`，先按上文运行 `./build-tako.sh all --update`，同步 west.yml 中固定的依赖；本次编译使用该固定提交的临时副本，通过 `TAKO_EXTRA_MODULES` 指定，不改变依赖版本。
 
-此前已通过 EDT 对比确认 EC / MUX 属性与稳定固件一致。本次未修改矩阵、电源、校准、蓝牙绑定或屏幕熄屏策略。尚未实机验证 Win/Mac 快捷键、双击操作手感及屏幕显示；编译和静态键位检查不能代替这些验证。
+此前已通过 EDT 对比确认 EC / MUX 属性与稳定固件一致。本次未修改矩阵、电源、校准、蓝牙绑定或屏幕熄屏策略。尚未实机验证 Win/Mac 快捷键、切换操作手感及屏幕显示；编译和静态键位检查不能代替这些验证。

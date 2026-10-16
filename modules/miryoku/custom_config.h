@@ -7,7 +7,7 @@
 
 // Windows boots by default. tako_modes.dtsi reuses these layers for Mac.
 #define MIRYOKU_CLIPBOARD_WIN
-#define U_OS_SWITCH &tako_to_mac
+#define U_OS_SWITCH &to 10
 #define U_WORD_PREV &kp LC(LEFT)
 #define U_WORD_NEXT &kp LC(RIGHT)
 

@@ -255,8 +255,7 @@ layers:
   - RGB HUI
   - RGB SAI
   - RGB BRI
-  - t: MAC
-    h: 2x
+  - MAC
   - Win
   - Alt
   - Ctrl
@@ -661,8 +660,7 @@ layers:
   - RGB HUI
   - RGB SAI
   - RGB BRI
-  - t: WIN
-    h: 2x
+  - WIN
   - Ctrl
   - Alt
   - Cmd
