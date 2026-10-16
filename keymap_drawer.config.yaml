@@ -7,6 +7,8 @@ draw_config:
   shrink_wide_legends: 6
 parse_config:
   raw_binding_map:
+    '&tako_to_mac': {t: MAC, h: 2x}
+    '&tako_to_win': {t: WIN, h: 2x}
     '&bootloader': BOOT
     '&caps_word': CAPS WORD
     '&mkp MB1': Mouse 1
@@ -50,6 +52,16 @@ parse_config:
     '&u_to_U_FUN':
       t: Fun
       h: 2x
+    '&tako_mac_to_base': {t: 'MAC Base', h: 2x}
+    '&tako_mac_to_extra': {t: 'MAC Extra', h: 2x}
+    '&tako_mac_to_tap': {t: 'MAC Tap', h: 2x}
+    '&tako_mac_to_button': {t: 'MAC Button', h: 2x}
+    '&tako_mac_to_nav': {t: 'MAC Nav', h: 2x}
+    '&tako_mac_to_mouse': {t: 'MAC Mouse', h: 2x}
+    '&tako_mac_to_media': {t: 'MAC Media', h: 2x}
+    '&tako_mac_to_num': {t: 'MAC Num', h: 2x}
+    '&tako_mac_to_sym': {t: 'MAC Sym', h: 2x}
+    '&tako_mac_to_fun': {t: 'MAC Fun', h: 2x}
     '&u_macro_u_bt_sel_0': Clear BT0
     '&u_macro_u_bt_sel_1': Clear BT1
     '&u_macro_u_bt_sel_2': Clear BT2
@@ -120,7 +132,9 @@ parse_config:
     NON_US_HASH: '#'
     NUHS: '#'
     TILDE2: '~'
-    LGUI: GUI
+    LGUI: Win
+    LEFT_GUI: Cmd
+    LEFT_CONTROL: Ctrl
     LALT: Alt
     RALT: AltGr
     LCTRL: Ctrl

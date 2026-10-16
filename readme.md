@@ -1,24 +1,24 @@
-# Tako ZMK — dongle 与左侧主设备双模式
+# Tako ZMK — Win/Mac 与 dongle / 左主双拓扑
 
-本分支 `codex/tako-dongle` 从稳定标签 `tako-analog-stable-2026-10-14`（`c262ce2`）创建。dongle 硬件与 [TOTEM feature/dongle_miryoku](https://github.com/GofranChang/zmk-config-totem/tree/feature/dongle_miryoku) 完全相同：nice!nano + I²C SH1106 128×64 OLED。
+本分支 `codex/tako-win-mac` 基于 `codex/tako-dongle` 增加 Win/Mac 模式；原 dongle 分支从稳定标签 `tako-analog-stable-2026-10-14`（`c262ce2`）创建。dongle 硬件与 [TOTEM feature/dongle_miryoku](https://github.com/GofranChang/zmk-config-totem/tree/feature/dongle_miryoku) 完全相同：nice!nano + I²C SH1106 128×64 OLED。
 
 ## Keymap
 
 <!-- keymap:start -->
 
-![Tako Base 层](keymap-drawer/tako-base.svg)
+![Tako Win/Mac Base 层](keymap-drawer/tako-base.svg)
 
 主字为点按，下方为长按；表格中的 `/` 分隔点按与长按。`2x` 表示双击切层；右上角标注为 Shift 功能。组合键框连接的按键需要同时按下。
 
 | 左1 | 左2 | 左3 | 左4 | 左5 | 右1 | 右2 | 右3 | 右4 | 右5 |
 |---|---|---|---|---|---|---|---|---|---|
 | Q | W | E | R | T | Y | U | I | O | P |
-| A / GUI | S / Alt | D / Ctrl | F / Shift | G | H | J / Shift | K / Ctrl | L / Alt | &#x27; / GUI |
-| Z / Button | X / AltGr | C | V | B | N | M | , | . / AltGr | / / Button |
+| A / Win | S / Alt | D / Ctrl | F / Shift | G | H | J / Shift | K / Ctrl | L / Alt | &#x27; / Win |
+| Z / WIN Button | X / AltGr | C | V | B | N | M | , | . / AltGr | / / WIN Button |
 
-拇指键（左至右）：SPACE / Nav；TAB / Mouse；RET / Sym；BSPC / Num。
+拇指键（左至右）：SPACE / WIN Nav；TAB / WIN Mouse；RET / WIN Sym；BSPC / WIN Num。
 
-共 10 层：Base、Extra、Tap、Button、Nav、Mouse、Media、Num、Sym、Fun。
+共 20 层：WIN Base、WIN Extra、WIN Tap、WIN Button、WIN Nav、WIN Mouse、WIN Media、WIN Num、WIN Sym、WIN Fun、MAC Base、MAC Extra、MAC Tap、MAC Button、MAC Nav、MAC Mouse、MAC Media、MAC Num、MAC Sym、MAC Fun。
 
 <details>
 <summary>展开全部层与组合键</summary>
@@ -37,6 +37,26 @@
 python -m pip install -r scripts/requirements-keymap.txt
 python scripts/draw_keymap.py
 ```
+
+## Win / Mac 模式
+
+开机默认 **WIN**。按住左侧两个拇指键（Space + Tab 的组合键）进入 Media，然后快速双击实体 `T`，切换到 **MAC Base**；在 MAC 模式同样操作可回到 **WIN Base**。单击 T 不切换，双击窗口为 200 ms。切换会回到目标系统的 Base 层，松开拇指后正常输入。模式保留到重启，不写入闪存，也不自动检测操作系统。
+
+| 操作位置 | WIN | MAC |
+| --- | --- | --- |
+| Base / Extra：长按 D、K | Ctrl | Command |
+| Base / Extra：长按 A、单引号 | Win | 真正的 Control |
+| 所有功能层的 Ctrl / GUI 位置 | Ctrl / Win | Command / Control |
+| Nav / Mouse / Button 复制、剪切、粘贴 | Ctrl+C / X / V | Command+C / X / V |
+| 撤销 / 重做 | Ctrl+Z / Ctrl+Y | Command+Z / Command+Shift+Z |
+| Nav：实体 N / 点号（原 Home / End） | Home / End | Command+← / → |
+| Nav：实体 T / G（原空位） | Ctrl+← / →，前 / 后一个词 | Option+← / →，前 / 后一个词 |
+
+Mac 的 Base / Extra 小指长按仍可发送真正 Ctrl，用于终端 Ctrl+C 等操作。Shift、Alt/Option、字母点按、数字符号、拇指键、鼠标及 USB/BLE 输出入口保持相同位置。Tap 层沿用 Miryoku 的无长按字母层，不增加 Home Row Mods。
+
+层从同一份 Miryoku 模板生成：WIN 为 0–9，MAC 为 10–19。每套的 layer-tap、双击跳层和拇指组合键都只指向本系统的层，因此切 Num / Sym / Nav / Extra 不会丢失系统模式。实现位于 `modules/miryoku/tako_modes.dtsi`，无新增依赖。若通过 Studio 改键，两套层需分别修改；旧 Studio 设置可能覆盖原 0–9 层的改动，请在 Studio 恢复仓库键位后重新定制，不要用 settings_reset 擦除校准数据。
+
+dongle 使用现有层状态组件，随当前层显示 `WIN Base`、`MAC Nav` 等名称；名称会在原位置滚动。底部的 Win 修饰键位图仍表示 GUI 键状态，图案不随模式切换，当前系统以层名称的 WIN / MAC 为准。左主屏若显示层名称，也使用同一套名称。
 
 ## 六个编译产物
 
@@ -144,10 +164,19 @@ nice!view 使用 [GPeye/hammerbeam-slideshow](https://github.com/GPeye/hammerbea
 
 ## 验证范围
 
-本次输出切换、Sym 改键和 USB 显示策略修改已进行源码检查及宿主 C 模拟测试（USB 插拔、空闲、睡眠、初始化等待，有/无显示 LED）。当前 WSL 没有 ZMK/Zephyr 工具链，本次修改尚未完整编译或实机验证；下面的六目标编译记录属于此前版本。
+2026-10-16：Win/Mac 版本已在现有 macOS ZMK v0.3 工具链上完成六目标编译：settings_reset、dongle、左从、右从、左主、右外围。两份右侧固件 SHA-256 相同。没有刷写设备。
 
-六个目标已全部本地编译通过，并核对最终角色分别为：dongle central（连接两半）、左主 central（连接一半）、其余半边 peripheral。两套主设备都启用 Studio，四个半边构建都保留 USB 校准，正常版不在启动时清绑定。两份右侧 UF2 的 SHA-256 相同，二进制完全一致。
+对五份实际键盘构建的 `edt.pickle` 运行 `scripts/verify_modes.py`，确认二十层各有 34 个键位、共 24 个拇指组合键；两套 layer-tap / 双击跳层 / 组合键的目标层正确；Ctrl / Command、三处剪贴板层、跳词、行首行尾和双击系统切换均符合模式。键位图生成通过并检查了两套 Base 图。
 
-已通过 EDT 对比确认 dongle 模式两半 EC / MUX 全部属性与稳定固件一致，三台的 34 键矩阵映射一致，右半 col-offset=5；dongle 为 mock kscan + SH1106 128×64，没有 EC 矩阵。
+复查方法（使用本地 Zephyr 的 Python 环境，仅加载自己编译生成的 pickle）：
 
-尚未进行实机蓝牙配对、OLED 方向和休眠续航测试；本地编译通过不能代替这些验证。
+```sh
+PYTHONPATH=../zmk-local/zephyr/scripts/dts/python-devicetree/src \
+  ../zmk-local/.venv/bin/python scripts/verify_modes.py \
+  ../zmk-local/build/win-mac-tako_dongle/zephyr/edt.pickle \
+  ../zmk-local/build/win-mac-tako_left_central/zephyr/edt.pickle
+```
+
+本地若未下载 `hammerbeam-slideshow`，先按上文运行 `./build-tako.sh all --update`，同步 west.yml 中固定的依赖；本次编译使用该固定提交的临时副本，通过 `TAKO_EXTRA_MODULES` 指定，不改变依赖版本。
+
+此前已通过 EDT 对比确认 EC / MUX 属性与稳定固件一致。本次未修改矩阵、电源、校准、蓝牙绑定或屏幕熄屏策略。尚未实机验证 Win/Mac 快捷键、双击操作手感及屏幕显示；编译和静态键位检查不能代替这些验证。

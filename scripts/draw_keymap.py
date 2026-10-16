@@ -53,8 +53,8 @@ def main():
 
     parsed = yaml.safe_load(keymap("parse", "-z", SOURCE))
     layers = parsed["layers"]
-    if not layers or "Base" not in layers:
-        raise ValueError("Source keymap must define a Base layer")
+    if not layers or "WIN Base" not in layers:
+        raise ValueError("Source keymap must define a WIN Base layer")
     for name, keys in layers.items():
         if len(flatten(keys)) != 34:
             raise ValueError(f"{name}: expected exactly 34 keys")
@@ -69,7 +69,7 @@ def main():
     OUTPUT.mkdir(exist_ok=True)
     data_path = OUTPUT / "tako.yaml"
     data_path.write_text(yaml.safe_dump(parsed, sort_keys=False, allow_unicode=True), encoding="utf-8")
-    for filename, extra in (("tako.svg", []), ("tako-base.svg", ["--select-layers", "Base"])):
+    for filename, extra in (("tako.svg", []), ("tako-base.svg", ["--select-layers", "WIN Base", "MAC Base"])):
         if filename == "tako-base.svg":
             base_data = parsed | {"draw_config": {"n_columns": 1}}
             svg = keymap("draw", "-", *extra, input_text=yaml.safe_dump(base_data, sort_keys=False))
@@ -80,14 +80,14 @@ def main():
         ET.fromstring(svg)  # Do not replace the README with a broken drawing.
         (OUTPUT / filename).write_text(svg, encoding="utf-8")
 
-    base = [legend(key) for key in flatten(layers["Base"])]
+    base = [legend(key) for key in flatten(layers["WIN Base"])]
     rows = ["| " + " | ".join(base[i:i + 10]) + " |" for i in range(0, 30, 10)]
     table = "\n".join([
         "| 左1 | 左2 | 左3 | 左4 | 左5 | 右1 | 右2 | 右3 | 右4 | 右5 |",
         "|---|---|---|---|---|---|---|---|---|---|", *rows,
     ])
     content = "\n\n" + "\n\n".join([
-        "![Tako Base 层](keymap-drawer/tako-base.svg)",
+        "![Tako Win/Mac Base 层](keymap-drawer/tako-base.svg)",
         "主字为点按，下方为长按；表格中的 `/` 分隔点按与长按。`2x` 表示双击切层；右上角标注为 Shift 功能。组合键框连接的按键需要同时按下。",
         table,
         "拇指键（左至右）：" + "；".join(base[30:]) + "。",

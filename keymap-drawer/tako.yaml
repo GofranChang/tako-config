@@ -1,7 +1,7 @@
 layout:
   dts_layout: config/boards/shields/tako/tako-layouts.dtsi
 layers:
-  Base:
+  WIN Base:
   - Q
   - W
   - E
@@ -13,7 +13,7 @@ layers:
   - O
   - P
   - t: A
-    h: GUI
+    h: Win
   - t: S
     h: Alt
   - t: D
@@ -29,9 +29,9 @@ layers:
   - t: L
     h: Alt
   - t: ''''
-    h: GUI
+    h: Win
   - t: Z
-    h: Button
+    h: WIN Button
   - t: X
     h: AltGr
   - C
@@ -43,16 +43,16 @@ layers:
   - t: .
     h: AltGr
   - t: /
-    h: Button
+    h: WIN Button
   - t: SPACE
-    h: Nav
+    h: WIN Nav
   - t: TAB
-    h: Mouse
+    h: WIN Mouse
   - t: RET
-    h: Sym
+    h: WIN Sym
   - t: BSPC
-    h: Num
-  Extra:
+    h: WIN Num
+  WIN Extra:
   - Q
   - W
   - E
@@ -64,7 +64,7 @@ layers:
   - O
   - P
   - t: A
-    h: GUI
+    h: Win
   - t: S
     h: Alt
   - t: D
@@ -80,9 +80,9 @@ layers:
   - t: L
     h: Alt
   - t: ''''
-    h: GUI
+    h: Win
   - t: Z
-    h: Button
+    h: WIN Button
   - t: X
     h: AltGr
   - C
@@ -94,16 +94,16 @@ layers:
   - t: .
     h: AltGr
   - t: /
-    h: Button
+    h: WIN Button
   - t: SPACE
-    h: Nav
+    h: WIN Nav
   - t: TAB
-    h: Mouse
+    h: WIN Mouse
   - t: RET
-    h: Sym
+    h: WIN Sym
   - t: BSPC
-    h: Num
-  Tap:
+    h: WIN Num
+  WIN Tap:
   - Q
   - W
   - F
@@ -138,18 +138,18 @@ layers:
   - TAB
   - RET
   - BSPC
-  Button:
-  - UNDO
-  - Sft+DEL
-  - Ctl+INS
-  - Sft+INS
-  - AGAIN
-  - AGAIN
-  - Sft+INS
-  - Ctl+INS
-  - Sft+DEL
-  - UNDO
-  - GUI
+  WIN Button:
+  - Ctl+Z
+  - Ctl+X
+  - Ctl+C
+  - Ctl+V
+  - Ctl+Y
+  - Ctl+Y
+  - Ctl+V
+  - Ctl+C
+  - Ctl+X
+  - Ctl+Z
+  - Win
   - Alt
   - Ctrl
   - Shift
@@ -158,23 +158,416 @@ layers:
   - Shift
   - Ctrl
   - Alt
-  - GUI
-  - t: UNDO
+  - Win
+  - t: Ctl+Z
     type: held
-  - Sft+DEL
-  - Ctl+INS
-  - Sft+INS
-  - AGAIN
-  - AGAIN
-  - Sft+INS
-  - Ctl+INS
-  - Sft+DEL
-  - UNDO
+  - Ctl+X
+  - Ctl+C
+  - Ctl+V
+  - Ctl+Y
+  - Ctl+Y
+  - Ctl+V
+  - Ctl+C
+  - Ctl+X
+  - Ctl+Z
   - Mouse 1
   - Mouse 2
   - Mouse 2
   - Mouse 1
-  Nav:
+  WIN Nav:
+  - BOOT
+  - '&u_to_U_TAP'
+  - '&u_to_U_EXTRA'
+  - '&u_to_U_BASE'
+  - Ctl+LEFT
+  - Ctl+Y
+  - Ctl+V
+  - Ctl+C
+  - Ctl+X
+  - Ctl+Z
+  - Win
+  - Alt
+  - Ctrl
+  - Shift
+  - Ctl+RIGHT
+  - LEFT
+  - DOWN
+  - UP
+  - RIGHT
+  - t: CAPS WORD
+    s: CAPS
+  - ''
+  - AltGr
+  - '&u_to_U_NUM'
+  - '&u_to_U_NAV'
+  - ''
+  - HOME
+  - PG DN
+  - PG UP
+  - END
+  - INS
+  - type: held
+  - ''
+  - RET
+  - BSPC
+  WIN Mouse:
+  - BOOT
+  - '&u_to_U_TAP'
+  - '&u_to_U_EXTRA'
+  - '&u_to_U_BASE'
+  - ''
+  - Ctl+Y
+  - Ctl+V
+  - Ctl+C
+  - Ctl+X
+  - Ctl+Z
+  - Win
+  - Alt
+  - Ctrl
+  - Shift
+  - ''
+  - Mouse L
+  - Mouse D
+  - Mouse U
+  - Mouse R
+  - ''
+  - ''
+  - AltGr
+  - '&u_to_U_SYM'
+  - '&u_to_U_MOUSE'
+  - ''
+  - Scroll L
+  - Scroll D
+  - Scroll U
+  - Scroll R
+  - ''
+  - ''
+  - type: held
+  - Mouse 2
+  - Mouse 1
+  WIN Media:
+  - BOOT
+  - '&u_to_U_TAP'
+  - '&u_to_U_EXTRA'
+  - '&u_to_U_BASE'
+  - t: MAC
+    h: 2x
+  - RGB EFF
+  - RGB HUI
+  - RGB SAI
+  - RGB BRI
+  - RGB TOG
+  - Win
+  - Alt
+  - Ctrl
+  - Shift
+  - ''
+  - PREV
+  - VOL DN
+  - VOL UP
+  - NEXT
+  - EP TOG
+  - ''
+  - AltGr
+  - '&u_to_U_FUN'
+  - '&u_to_U_MEDIA'
+  - ''
+  - t: BT
+    h: '0'
+    s: Clear BT0
+  - t: BT
+    h: '1'
+    s: Clear BT1
+  - t: BT
+    h: '2'
+    s: Clear BT2
+  - t: BT
+    h: '3'
+    s: Clear BT3
+  - OUT TOG
+  - type: held
+  - type: held
+  - STOP
+  - PP
+  WIN Num:
+  - '['
+  - '7'
+  - '8'
+  - '9'
+  - ']'
+  - ''
+  - '&u_to_U_BASE'
+  - '&u_to_U_EXTRA'
+  - '&u_to_U_TAP'
+  - BOOT
+  - ;
+  - '4'
+  - '5'
+  - '6'
+  - '='
+  - ''
+  - Shift
+  - Ctrl
+  - Alt
+  - Win
+  - '`'
+  - '1'
+  - '2'
+  - '3'
+  - \
+  - ''
+  - '&u_to_U_NUM'
+  - '&u_to_U_NAV'
+  - AltGr
+  - ''
+  - '0'
+  - '-'
+  - ''
+  - type: held
+  WIN Sym:
+  - '{'
+  - '&'
+  - '*'
+  - (
+  - '}'
+  - ''
+  - '&u_to_U_BASE'
+  - ESC
+  - '&u_to_U_TAP'
+  - BOOT
+  - ':'
+  - $
+  - '%'
+  - ^
+  - +
+  - ''
+  - Shift
+  - Ctrl
+  - Alt
+  - Win
+  - '~'
+  - '!'
+  - '@'
+  - '#'
+  - '|'
+  - ''
+  - '&u_to_U_SYM'
+  - (
+  - )
+  - ''
+  - )
+  - _
+  - type: held
+  - ''
+  WIN Fun:
+  - F12
+  - F7
+  - F8
+  - F9
+  - PSCRN
+  - ''
+  - '&u_to_U_BASE'
+  - '&u_to_U_EXTRA'
+  - '&u_to_U_TAP'
+  - BOOT
+  - F11
+  - F4
+  - F5
+  - F6
+  - SLCK
+  - ''
+  - Shift
+  - Ctrl
+  - Alt
+  - Win
+  - F10
+  - F1
+  - F2
+  - F3
+  - PAUSE BREAK
+  - ''
+  - '&u_to_U_FUN'
+  - '&u_to_U_MEDIA'
+  - AltGr
+  - ''
+  - SPACE
+  - TAB
+  - type: held
+  - type: held
+  MAC Base:
+  - Q
+  - W
+  - E
+  - R
+  - T
+  - Y
+  - U
+  - I
+  - O
+  - P
+  - t: A
+    h: Ctrl
+  - t: S
+    h: Alt
+  - t: D
+    h: Cmd
+  - t: F
+    h: Shift
+  - G
+  - H
+  - t: J
+    h: Shift
+  - t: K
+    h: Cmd
+  - t: L
+    h: Alt
+  - t: ''''
+    h: Ctrl
+  - t: Z
+    h: MAC Button
+  - t: X
+    h: AltGr
+  - C
+  - V
+  - B
+  - N
+  - M
+  - ','
+  - t: .
+    h: AltGr
+  - t: /
+    h: MAC Button
+  - t: SPACE
+    h: MAC Nav
+  - t: TAB
+    h: MAC Mouse
+  - t: RET
+    h: MAC Sym
+  - t: BSPC
+    h: MAC Num
+  MAC Extra:
+  - Q
+  - W
+  - E
+  - R
+  - T
+  - Y
+  - U
+  - I
+  - O
+  - P
+  - t: A
+    h: Ctrl
+  - t: S
+    h: Alt
+  - t: D
+    h: Cmd
+  - t: F
+    h: Shift
+  - G
+  - H
+  - t: J
+    h: Shift
+  - t: K
+    h: Cmd
+  - t: L
+    h: Alt
+  - t: ''''
+    h: Ctrl
+  - t: Z
+    h: MAC Button
+  - t: X
+    h: AltGr
+  - C
+  - V
+  - B
+  - N
+  - M
+  - ','
+  - t: .
+    h: AltGr
+  - t: /
+    h: MAC Button
+  - t: SPACE
+    h: MAC Nav
+  - t: TAB
+    h: MAC Mouse
+  - t: RET
+    h: MAC Sym
+  - t: BSPC
+    h: MAC Num
+  MAC Tap:
+  - Q
+  - W
+  - F
+  - P
+  - B
+  - J
+  - L
+  - U
+  - Y
+  - ''''
+  - A
+  - R
+  - S
+  - T
+  - G
+  - M
+  - N
+  - E
+  - I
+  - O
+  - Z
+  - X
+  - C
+  - D
+  - V
+  - K
+  - H
+  - ','
+  - .
+  - /
+  - SPACE
+  - TAB
+  - RET
+  - BSPC
+  MAC Button:
+  - Gui+Z
+  - Gui+X
+  - Gui+C
+  - Gui+V
+  - Sft+Gui+Z
+  - Sft+Gui+Z
+  - Gui+V
+  - Gui+C
+  - Gui+X
+  - Gui+Z
+  - Ctrl
+  - Alt
+  - Cmd
+  - Shift
+  - ''
+  - ''
+  - Shift
+  - Cmd
+  - Alt
+  - Ctrl
+  - t: Gui+Z
+    type: held
+  - Gui+X
+  - Gui+C
+  - Gui+V
+  - Sft+Gui+Z
+  - Sft+Gui+Z
+  - Gui+V
+  - Gui+C
+  - Gui+X
+  - Gui+Z
+  - Mouse 1
+  - Mouse 2
+  - Mouse 2
+  - Mouse 1
+  MAC Nav:
   - BOOT
   - t: Tap
     h: 2x
@@ -182,17 +575,17 @@ layers:
     h: 2x
   - t: Base
     h: 2x
-  - ''
-  - AGAIN
-  - Sft+INS
-  - Ctl+INS
-  - Sft+DEL
-  - UNDO
-  - GUI
-  - Alt
+  - Alt+LEFT
+  - Sft+Gui+Z
+  - Gui+V
+  - Gui+C
+  - Gui+X
+  - Gui+Z
   - Ctrl
+  - Alt
+  - Cmd
   - Shift
-  - ''
+  - Alt+RIGHT
   - LEFT
   - DOWN
   - UP
@@ -206,16 +599,16 @@ layers:
   - t: Nav
     h: 2x
   - ''
-  - HOME
+  - Gui+LEFT
   - PG DN
   - PG UP
-  - END
+  - Gui+RIGHT
   - INS
   - type: held
   - ''
   - RET
   - BSPC
-  Mouse:
+  MAC Mouse:
   - BOOT
   - t: Tap
     h: 2x
@@ -224,14 +617,14 @@ layers:
   - t: Base
     h: 2x
   - ''
-  - AGAIN
-  - Sft+INS
-  - Ctl+INS
-  - Sft+DEL
-  - UNDO
-  - GUI
-  - Alt
+  - Sft+Gui+Z
+  - Gui+V
+  - Gui+C
+  - Gui+X
+  - Gui+Z
   - Ctrl
+  - Alt
+  - Cmd
   - Shift
   - ''
   - Mouse L
@@ -255,7 +648,7 @@ layers:
   - type: held
   - Mouse 2
   - Mouse 1
-  Media:
+  MAC Media:
   - BOOT
   - t: Tap
     h: 2x
@@ -263,15 +656,16 @@ layers:
     h: 2x
   - t: Base
     h: 2x
-  - ''
+  - t: WIN
+    h: 2x
   - RGB EFF
   - RGB HUI
   - RGB SAI
   - RGB BRI
   - RGB TOG
-  - GUI
-  - Alt
   - Ctrl
+  - Alt
+  - Cmd
   - Shift
   - ''
   - PREV
@@ -303,7 +697,7 @@ layers:
   - type: held
   - STOP
   - PP
-  Num:
+  MAC Num:
   - '['
   - '7'
   - '8'
@@ -324,9 +718,9 @@ layers:
   - '='
   - ''
   - Shift
-  - Ctrl
+  - Cmd
   - Alt
-  - GUI
+  - Ctrl
   - '`'
   - '1'
   - '2'
@@ -343,7 +737,7 @@ layers:
   - '-'
   - ''
   - type: held
-  Sym:
+  MAC Sym:
   - '{'
   - '&'
   - '*'
@@ -363,9 +757,9 @@ layers:
   - +
   - ''
   - Shift
-  - Ctrl
+  - Cmd
   - Alt
-  - GUI
+  - Ctrl
   - '~'
   - '!'
   - '@'
@@ -381,7 +775,7 @@ layers:
   - _
   - type: held
   - ''
-  Fun:
+  MAC Fun:
   - F12
   - F7
   - F8
@@ -402,9 +796,9 @@ layers:
   - SLCK
   - ''
   - Shift
-  - Ctrl
+  - Cmd
   - Alt
-  - GUI
+  - Ctrl
   - F10
   - F1
   - F2
@@ -427,9 +821,9 @@ combos:
   - 31
   k:
     t: ESC
-    h: Media
+    h: WIN Media
   l:
-  - Base
+  - WIN Base
   align: bottom
   offset: 0.5
 - p:
@@ -437,9 +831,9 @@ combos:
   - 31
   k:
     t: ESC
-    h: Media
+    h: WIN Media
   l:
-  - Extra
+  - WIN Extra
   align: bottom
   offset: 0.5
 - p:
@@ -447,7 +841,7 @@ combos:
   - 31
   k: Mouse 3
   l:
-  - Button
+  - WIN Button
   align: bottom
   offset: 0.5
 - p:
@@ -455,7 +849,7 @@ combos:
   - 31
   k: .
   l:
-  - Num
+  - WIN Num
   align: bottom
   offset: 0.5
 - p:
@@ -463,7 +857,7 @@ combos:
   - 31
   k: (
   l:
-  - Sym
+  - WIN Sym
   align: bottom
   offset: 0.5
 - p:
@@ -471,7 +865,7 @@ combos:
   - 31
   k: APP
   l:
-  - Fun
+  - WIN Fun
   align: bottom
   offset: 0.5
 - p:
@@ -479,9 +873,9 @@ combos:
   - 33
   k:
     t: DEL
-    h: Fun
+    h: WIN Fun
   l:
-  - Base
+  - WIN Base
   align: bottom
   offset: 0.5
 - p:
@@ -489,9 +883,9 @@ combos:
   - 33
   k:
     t: DEL
-    h: Fun
+    h: WIN Fun
   l:
-  - Extra
+  - WIN Extra
   align: bottom
   offset: 0.5
 - p:
@@ -499,7 +893,7 @@ combos:
   - 33
   k: Mouse 3
   l:
-  - Button
+  - WIN Button
   align: bottom
   offset: 0.5
 - p:
@@ -507,7 +901,7 @@ combos:
   - 33
   k: DEL
   l:
-  - Nav
+  - WIN Nav
   align: bottom
   offset: 0.5
 - p:
@@ -515,7 +909,7 @@ combos:
   - 33
   k: Mouse 3
   l:
-  - Mouse
+  - WIN Mouse
   align: bottom
   offset: 0.5
 - p:
@@ -523,6 +917,110 @@ combos:
   - 33
   k: MUTE
   l:
-  - Media
+  - WIN Media
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k:
+    t: ESC
+    h: MAC Media
+  l:
+  - MAC Base
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k:
+    t: ESC
+    h: MAC Media
+  l:
+  - MAC Extra
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: Mouse 3
+  l:
+  - MAC Button
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: .
+  l:
+  - MAC Num
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: (
+  l:
+  - MAC Sym
+  align: bottom
+  offset: 0.5
+- p:
+  - 30
+  - 31
+  k: APP
+  l:
+  - MAC Fun
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k:
+    t: DEL
+    h: MAC Fun
+  l:
+  - MAC Base
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k:
+    t: DEL
+    h: MAC Fun
+  l:
+  - MAC Extra
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: Mouse 3
+  l:
+  - MAC Button
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: DEL
+  l:
+  - MAC Nav
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: Mouse 3
+  l:
+  - MAC Mouse
+  align: bottom
+  offset: 0.5
+- p:
+  - 32
+  - 33
+  k: MUTE
+  l:
+  - MAC Media
   align: bottom
   offset: 0.5

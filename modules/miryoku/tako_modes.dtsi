@@ -1,0 +1,196 @@
+/* SPDX-License-Identifier: MIT
+ * Two complete layer banks generated from the same Miryoku definitions.
+ * Win IDs 0..9 stay stable for Studio. Mac IDs 10..19 use their own layer-taps,
+ * guarded layer jumps and thumb combos, so no overlay can shadow other layers.
+ * Keep this include last in the keymap: aliases below are local to Mac emission.
+ */
+#include "miryoku_babel/miryoku_layer_list.h"
+#undef MIRYOKU_LAYER_LIST
+#define MIRYOKU_LAYER_LIST \
+MIRYOKU_X(BASE, "WIN Base") \
+MIRYOKU_X(EXTRA, "WIN Extra") \
+MIRYOKU_X(TAP, "WIN Tap") \
+MIRYOKU_X(BUTTON, "WIN Button") \
+MIRYOKU_X(NAV, "WIN Nav") \
+MIRYOKU_X(MOUSE, "WIN Mouse") \
+MIRYOKU_X(MEDIA, "WIN Media") \
+MIRYOKU_X(NUM, "WIN Num") \
+MIRYOKU_X(SYM, "WIN Sym") \
+MIRYOKU_X(FUN, "WIN Fun")
+
+#include <behaviors.dtsi>
+#include <behaviors/mouse_keys.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/rgb.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/ext_power.h>
+#include "miryoku.h"
+#include <dt-bindings/zmk/pointing.h>
+
+#include "miryoku_shift_functions.dtsi"
+#include "miryoku_double_tap_guard.dtsi"
+#include "miryoku_mousekeys.dtsi"
+#include "miryoku_behaviors.dtsi"
+
+
+MIRYOKU_DOUBLE_TAP_GUARD(tako_to_mac, &to 10)
+MIRYOKU_DOUBLE_TAP_GUARD(tako_to_win, &to 0)
+
+/ {
+  keymap {
+    compatible = "zmk,keymap";
+#define MIRYOKU_X(LAYER, STRING) \
+    LAYER { \
+      display-name = STRING; \
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_##LAYER, MIRYOKU_LAYER_##LAYER) >; \
+    };
+MIRYOKU_LAYER_LIST
+#undef MIRYOKU_X
+
+// Change only aliases used in the layer templates; LC()/LG() retain real HID
+// Ctrl/GUI semantics, including clipboard and Command+arrow navigation.
+#undef LCTRL
+#define LCTRL LEFT_GUI
+#undef LGUI
+#define LGUI LEFT_CONTROL
+#undef HOME
+#define HOME LG(LEFT)
+#undef END
+#define END LG(RIGHT)
+#undef U_RDO
+#define U_RDO &kp LS(LG(Z))
+#undef U_PST
+#define U_PST &kp LG(V)
+#undef U_CPY
+#define U_CPY &kp LG(C)
+#undef U_CUT
+#define U_CUT &kp LG(X)
+#undef U_UND
+#define U_UND &kp LG(Z)
+#undef U_WORD_PREV
+#define U_WORD_PREV &kp LA(LEFT)
+#undef U_WORD_NEXT
+#define U_WORD_NEXT &kp LA(RIGHT)
+#undef U_OS_SWITCH
+#define U_OS_SWITCH &tako_to_win
+
+#undef U_BASE
+#define U_BASE 10
+#define u_to_U_BASE tako_mac_to_base
+#undef U_EXTRA
+#define U_EXTRA 11
+#define u_to_U_EXTRA tako_mac_to_extra
+#undef U_TAP
+#define U_TAP 12
+#define u_to_U_TAP tako_mac_to_tap
+#undef U_BUTTON
+#define U_BUTTON 13
+#define u_to_U_BUTTON tako_mac_to_button
+#undef U_NAV
+#define U_NAV 14
+#define u_to_U_NAV tako_mac_to_nav
+#undef U_MOUSE
+#define U_MOUSE 15
+#define u_to_U_MOUSE tako_mac_to_mouse
+#undef U_MEDIA
+#define U_MEDIA 16
+#define u_to_U_MEDIA tako_mac_to_media
+#undef U_NUM
+#define U_NUM 17
+#define u_to_U_NUM tako_mac_to_num
+#undef U_SYM
+#define U_SYM 18
+#define u_to_U_SYM tako_mac_to_sym
+#undef U_FUN
+#define U_FUN 19
+#define u_to_U_FUN tako_mac_to_fun
+
+    MAC_BASE {
+      display-name = "MAC Base";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_BASE, MIRYOKU_LAYER_BASE) >;
+    };
+    MAC_EXTRA {
+      display-name = "MAC Extra";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_EXTRA, MIRYOKU_LAYER_EXTRA) >;
+    };
+    MAC_TAP {
+      display-name = "MAC Tap";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_TAP, MIRYOKU_LAYER_TAP) >;
+    };
+    MAC_BUTTON {
+      display-name = "MAC Button";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_BUTTON, MIRYOKU_LAYER_BUTTON) >;
+    };
+    MAC_NAV {
+      display-name = "MAC Nav";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_NAV, MIRYOKU_LAYER_NAV) >;
+    };
+    MAC_MOUSE {
+      display-name = "MAC Mouse";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_MOUSE, MIRYOKU_LAYER_MOUSE) >;
+    };
+    MAC_MEDIA {
+      display-name = "MAC Media";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_MEDIA, MIRYOKU_LAYER_MEDIA) >;
+    };
+    MAC_NUM {
+      display-name = "MAC Num";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_NUM, MIRYOKU_LAYER_NUM) >;
+    };
+    MAC_SYM {
+      display-name = "MAC Sym";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_SYM, MIRYOKU_LAYER_SYM) >;
+    };
+    MAC_FUN {
+      display-name = "MAC Fun";
+      bindings = < U_MACRO_VA_ARGS(MIRYOKU_LAYERMAPPING_FUN, MIRYOKU_LAYER_FUN) >;
+    };
+  };
+};
+
+// These aliases generate separate, mode-local double-tap layer jumps.
+#define MIRYOKU_X(LAYER, STRING) \
+MIRYOKU_DOUBLE_TAP_GUARD(u_to_U_##LAYER, &to U_##LAYER)
+MIRYOKU_LAYER_LIST
+#undef MIRYOKU_X
+
+// The Ferris mapping has two thumb keys per hand. Keep both banks in one
+// combos node, which is also understood by keymap-drawer without DTS merging.
+#define TAKO_THUMB_COMBO(NAME, LAYER, POSITION, BINDING) \
+NAME { \
+  layers = <LAYER>; \
+  key-positions = <MIRYOKU_KLUDGE_THUMBCOMBOS_ ## POSITION>; \
+  bindings = <BINDING>; \
+  timeout-ms = <200>; \
+};
+/ {
+  combos {
+    compatible = "zmk,combos";
+    TAKO_THUMB_COMBO(thumbcombos_U_BASE_LEFT, 0, LEFT, &lt 6 ESC)
+    TAKO_THUMB_COMBO(thumbcombos_U_EXTRA_LEFT, 1, LEFT, &lt 6 ESC)
+    TAKO_THUMB_COMBO(thumbcombos_U_BUTTON_LEFT, 3, LEFT, U_BTN3)
+    TAKO_THUMB_COMBO(thumbcombos_U_NUM_LEFT, 7, LEFT, &kp DOT)
+    TAKO_THUMB_COMBO(thumbcombos_U_SYM_LEFT, 8, LEFT, &kp LPAR)
+    TAKO_THUMB_COMBO(thumbcombos_U_FUN_LEFT, 9, LEFT, &kp K_APP)
+    TAKO_THUMB_COMBO(thumbcombos_U_BASE_RIGHT, 0, RIGHT, &lt 9 DEL)
+    TAKO_THUMB_COMBO(thumbcombos_U_EXTRA_RIGHT, 1, RIGHT, &lt 9 DEL)
+    TAKO_THUMB_COMBO(thumbcombos_U_BUTTON_RIGHT, 3, RIGHT, U_BTN3)
+    TAKO_THUMB_COMBO(thumbcombos_U_NAV_RIGHT, 4, RIGHT, &kp DEL)
+    TAKO_THUMB_COMBO(thumbcombos_U_MOUSE_RIGHT, 5, RIGHT, U_BTN3)
+    TAKO_THUMB_COMBO(thumbcombos_U_MEDIA_RIGHT, 6, RIGHT, &kp C_MUTE)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_BASE_LEFT, 10, LEFT, &lt 16 ESC)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_EXTRA_LEFT, 11, LEFT, &lt 16 ESC)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_BUTTON_LEFT, 13, LEFT, U_BTN3)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_NUM_LEFT, 17, LEFT, &kp DOT)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_SYM_LEFT, 18, LEFT, &kp LPAR)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_FUN_LEFT, 19, LEFT, &kp K_APP)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_BASE_RIGHT, 10, RIGHT, &lt 19 DEL)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_EXTRA_RIGHT, 11, RIGHT, &lt 19 DEL)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_BUTTON_RIGHT, 13, RIGHT, U_BTN3)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_NAV_RIGHT, 14, RIGHT, &kp DEL)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_MOUSE_RIGHT, 15, RIGHT, U_BTN3)
+    TAKO_THUMB_COMBO(tako_mac_thumb_U_MEDIA_RIGHT, 16, RIGHT, &kp C_MUTE)
+  };
+};
+#undef TAKO_THUMB_COMBO

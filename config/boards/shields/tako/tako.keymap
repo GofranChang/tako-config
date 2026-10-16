@@ -6,7 +6,7 @@
 
 #include "../../../../modules/miryoku/custom_config.h"
 #include "../../../../modules/miryoku/mapping/34/ferris.h"
-#include "../../../../modules/miryoku/miryoku.dtsi"
+#include "../../../../modules/miryoku/tako_modes.dtsi"
 
 // #include <behaviors.dtsi>
 // #include <dt-bindings/zmk/keys.h>
