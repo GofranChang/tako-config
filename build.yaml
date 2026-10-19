@@ -1,11 +1,11 @@
-# Six artifacts: reset, dongle trio, and direct-USB left-central/right-peripheral pair.
+# Seven artifacts: existing six variants plus a right-side Cirque peripheral.
 ---
 include:
   - board: nice_nano_v2
     shield: settings_reset
     artifact-name: settings_reset
   - board: nice_nano_v2
-    shield: tako_dongle dongle_display
+    shield: tako_dongle dongle_display tako_cirque_receiver
     snippet: studio-rpc-usb-uart
     cmake-args: -DCONFIG_ZMK_STUDIO=y
     artifact-name: tako_dongle
@@ -18,7 +18,7 @@ include:
     snippet: zmk-analog-matrix-calibrator
     artifact-name: tako_right_dongle
   - board: nice_nano_v2
-    shield: tako_left nice_view_custom
+    shield: tako_left nice_view_custom tako_cirque_receiver
     snippet: studio-rpc-usb-uart zmk-analog-matrix-calibrator
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_STUDIO_LOCKING=n
     artifact-name: tako_left_central
@@ -26,3 +26,8 @@ include:
     shield: tako_right nice_view_custom
     snippet: zmk-analog-matrix-calibrator
     artifact-name: tako_right_peripheral
+  # Same peripheral works with the left central or the dongle; replaces nice!view.
+  - board: nice_nano_v2
+    shield: tako_right tako_cirque_right
+    snippet: zmk-analog-matrix-calibrator
+    artifact-name: tako_right_cirque

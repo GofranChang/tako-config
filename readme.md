@@ -58,9 +58,9 @@ Mac 的 Base / Extra 小指长按仍可发送真正 Ctrl，用于终端 Ctrl+C �
 
 dongle 使用现有层状态组件，随当前层显示 `WIN Base`、`MAC Nav` 等名称；名称会在原位置滚动。底部的 Win 修饰键位图仍表示 GUI 键状态，图案不随模式切换，当前系统以层名称的 WIN / MAC 为准。左主屏若显示层名称，也使用同一套名称。
 
-## 六个编译产物
+## 七个编译产物
 
-`build.yaml` 一次固定生成以下六个 UF2；文件名显式区分两套连接方式。
+`build.yaml` 一次固定生成以下七个 UF2；文件名显式区分两套连接方式。
 
 | 文件名 | 用途 |
 | --- | --- |
@@ -70,8 +70,9 @@ dongle 使用现有层状态组件，随当前层显示 `WIN Base`、`MAC Nav` �
 | `tako_right_dongle.uf2` | dongle 模式右侧从设备 |
 | `tako_left_central.uf2` | 左侧 USB 连电脑的主设备，连接右半 |
 | `tako_right_peripheral.uf2` | 左主右从模式的右侧从设备 |
+| `tako_right_cirque.uf2` | 右侧 Cirque I²C + DR 从设备，替代右侧 nice!view；两种拓扑通用 |
 
-两份右侧固件的配置和功能相同，分别命名便于成套选择。连接哪个主设备由蓝牙绑定决定，文件名本身不会指定绑定对象。左侧角色由构建项显式选择：默认从设备；左主构建通过 CMake 覆盖为 central，并开启 Studio。
+两份原有 nice!view 右侧固件的配置和功能相同，分别命名便于成套选择。连接哪个主设备由蓝牙绑定决定，文件名本身不会指定绑定对象。左侧角色由构建项显式选择：默认从设备；左主构建通过 CMake 覆盖为 central，并开启 Studio。
 
 ## dongle 模式连接方式
 
@@ -97,6 +98,29 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 在两种拓扑间切换不是自动切主：需给左半刷对应角色固件，并清理两端旧蓝牙绑定后重新配对；右半只更新固件不会清除旧绑定。
 
+## 右侧 Cirque 触控板
+
+使用已在 PandaKB 上验证的五针转接 PCB，替换右侧 nice!view。新增 `tako_right_cirque.uf2`；原有六个输出保留。驱动固定为 `petejohanson/cirque-input-module@0de55f36bc720b5be3d8880dc856d4d78baf5214`，与 [PandaKB 已验证分支](https://github.com/GofranChang/zmk-for-PandaKB/tree/codex/cirque-i2c) 相同，沿用 100 kHz、地址 `0x2a`、默认方向/灵敏度和轻触点击设置。此次未增加手势滚动或自动鼠标层。
+
+| 转接板信号 | 原右侧 nice!view 信号 | nice!nano GPIO |
+| --- | --- | --- |
+| SDA | MOSI | P0.17 |
+| SCL | SCK | P0.20 |
+| VCC | VCC | 3.3 V |
+| GND | GND | GND |
+| DR | CS | **P0.09**，高电平有效 |
+
+注意：PandaKB 的 DR 为 P0.08，Tako 右侧是 **P0.09**，不能原样照抄。Cirque 本体需已移除 I²C 模式选择电阻；保留转接板的两个 4.7 kΩ SDA/SCL 上拉。附加 shield `tako_cirque_right` 关闭右侧 SPI1 和显示，启用 I²C0；不与 `nice_view` 或 `nice_view_custom` 同时使用。EC 矩阵、MUX、ADC、50% 触发、校准存储和串口保持原配置。
+
+| 使用方式 | 左侧 | 右侧 | dongle |
+| --- | --- | --- | --- |
+| 左半 USB、右半 BLE | **本次更新后的** `tako_left_central.uf2` | `tako_right_cirque.uf2` | 不参与 |
+| dongle USB、两半 BLE | `tako_left_dongle.uf2` | `tako_right_cirque.uf2` | **本次更新后的** `tako_dongle.uf2` |
+
+右侧通过 BLE split input 通道 `0` 转发鼠标事件；左主和 dongle 的既有输出均通过 `tako_cirque_receiver` 附加 shield 加入接收配置，只有新增右侧一种 UF2，但**第一次使用也必须更新对应主设备**，旧主设备固件无法处理触控板数据。同拓扑更新不需要清绑定或重新校准；若从左主切到 dongle，仍按下文流程更换绑定。
+
+保留右侧 15 分钟深度睡眠和实体 reset 恢复方式。无右屏后，电量可从支持外围电量的主设备界面查看。安装后的实际坐标方向和续航需实测；方向不对时在 `tako_cirque_right.overlay` 的 `trackpad@2a` 节点调整 `rotate-90`、`x-invert` 或 `y-invert`，不要修改 SDA/SCL 接线。
+
 ## 输出切换、屏幕与符号层
 
 - Media 层实体 `/` 键（原 `u_out_tog` 位置）直接切换 USB / 蓝牙输出，按住 Shift 也能切换。先将主设备（dongle 或左主）与目标电脑配对，并选择对应蓝牙配置；蓝牙未连接时，ZMK 会回退到可用的 USB 输出。从设备的 USB 仍用于充电和校准。
@@ -116,15 +140,18 @@ ZMK 保持 v0.3，因此 board 名仍为 `nice_nano_v2`，没有照搬新版 `ni
 
 ## 编译与固件
 
-GitHub Actions 读取 `build.yaml`，一次生成上述六个固件，使用独立 artifact-name，两个右侧构建不会互相覆盖。远程构建前，须先将驱动仓库的固定提交推送到 GitHub，再推送本配置分支。
+GitHub Actions 读取 `build.yaml`，一次生成上述七个固件，使用独立 artifact-name，三个右侧构建不会互相覆盖。远程构建前，须先将驱动仓库的固定提交推送到 GitHub，再推送本配置分支。
 
 已配置的本地环境：
 
 ```sh
 cd /Users/gofran/Documents/workspace/keyboard/zmk-local
-./build-tako.sh all          # 一次构建六个固件（默认）
+./build-tako.sh all          # 一次构建七个固件（默认）
 ./build-tako.sh dongle-set   # dongle + 左右从设备，共三个
-./build-tako.sh wired-set    # 左主 + 右从，共两个
+./build-tako.sh wired-set    # 左主 + nice!view 右从，共两个
+./build-tako.sh wired-cirque-set  # 左主 + Cirque 右从，共两个
+./build-tako.sh dongle-cirque-set # dongle + 左从 + Cirque 右从，共三个
+./build-tako.sh right-cirque      # 仅 Cirque 右从
 ./build-tako.sh both         # dongle 模式的左右从设备
 ./build-tako.sh left-central # 仅左主
 ./build-tako.sh dongle       # 仅 dongle
@@ -163,6 +190,8 @@ ec KSCAN calibration load
 nice!view 使用 [GPeye/hammerbeam-slideshow](https://github.com/GPeye/hammerbeam-slideshow)，固定提交 `9c16436efa4c87d19e2e4558927969c7ddd5851d`。30 张图片每张显示 20 秒，`CONFIG_CUSTOM_ANIMATION_SPEED=600000` 是整轮 600 秒的时长，并非单张时长。dongle 模式左右半均为从设备，两块屏都会播放；左主右从模式下，左主使用主题自带状态界面，右从播放。幻灯片在电池空闲时继续播放，15 分钟后仍会深度睡眠；USB 供电时持续播放。dongle 的 SH1106 OLED 保持原有主题。电量仍是电压估算，并非电流或精确容量测量。dongle 模式左右屏不显示 dongle 上的实时层状态；层状态请看 dongle OLED。左主右从模式的层状态在左主设备屏幕显示。
 
 ## 验证范围
+
+2026-10-19：新增右侧 Cirque 后，七个目标均已完整本地编译通过。检查最终 `.config` 和 EDT：右侧 Cirque、左主、dongle 均实际启用 split input 通道 0；接收端 listener 已启用；右侧 I²C0 的 SDA=P0.17、SCL=P0.20、DR=P0.09，SPI1 和显示关闭，触控板引脚不占用 EC/MUX 控制引脚。与同次构建的普通右侧逐项比较，EC/MUX/ADC/矩阵映射完全一致；保留校准 Shell、外设电源和 15 分钟睡眠。普通左右从设备的 nice!view 保留，不包含 Cirque 驱动。左主、dongle 和 Cirque 右侧均通过现有 Win/Mac 键位验证（20 层、34 键位、24 组合键）。Tako 实机触控、方向、BLE 转发和续航尚待验证。
 
 2026-10-16：Win/Mac 版本已在现有 macOS ZMK v0.3 工具链上完成六目标编译：settings_reset、dongle、左从、右从、左主、右外围。两份右侧固件 SHA-256 相同。随后将系统切换入口移至 Media 层 P，重新编译 dongle 和左主并通过对应键位检查；该入口现为单击切换。没有刷写设备。
 

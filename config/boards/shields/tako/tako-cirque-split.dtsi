@@ -1,0 +1,20 @@
+/* Shared BLE input channel. Included only by Cirque or receiver shields.
+ * Shield overlays (not CONFIG_* guards) select the nodes before Kconfig runs.
+ */
+/ {
+    tako_cirque_splits {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        tako_cirque_split: input@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+    };
+
+    tako_cirque_listener: tako_cirque_listener {
+        compatible = "zmk,input-listener";
+        status = "disabled";
+        device = <&tako_cirque_split>;
+    };
+};
