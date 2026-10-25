@@ -48,5 +48,7 @@
          * TM040040-2024-303 with the concave overlay. This is ADC attenuation,
          * not cursor speed. Validate tracking/hover on the assembled keyboard. */
         sensitivity = "1x";
+        /* Mounted orientation: reverse horizontal movement only. */
+        x-invert;
     };
 };

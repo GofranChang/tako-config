@@ -123,6 +123,8 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 右侧通过 BLE split input 通道 `0` 转发鼠标事件；左主和 dongle 的既有输出均通过 `tako_cirque_receiver` 附加 shield 加入接收配置，只有新增右侧一种 UF2，但**第一次使用也必须更新对应主设备**，旧主设备固件无法处理触控板数据。同拓扑更新不需要清绑定或重新校准；若从左主切到 dongle，仍按下文流程更换绑定。
 
+右侧当前安装方向启用 `x-invert`，仅反转水平移动，保持上下方向；`rotate-90` 和 `y-invert` 未启用。直线上滑时的侧偏仍需实测，单轴反转不等于角度补偿。
+
 保留右侧 15 分钟深度睡眠和实体 reset 恢复方式。无右屏后，电量可从支持外围电量的主设备界面查看。安装后的实际坐标方向和续航需实测；方向不对时在 `tako_cirque_right.overlay` 的 `trackpad@2a` 节点调整 `rotate-90`、`x-invert` 或 `y-invert`，不要修改 SDA/SCL 接线。
 
 2026-10-25：在独立分支重新完整编译 `tako_right_cirque`、`tako_left_central`、`tako_dongle`，三个目标均通过。检查本次生成的 `.config` 和 EDT：右侧 I²C0 为 100 kHz/0x2a，SDA=P0.17、SCL=P0.20、DR=P0.09 高电平有效，灵敏度 1x，显示关闭；左右主/从及 dongle 共用 split input 通道 0。右侧完整 kscan、ec_mux 和矩阵映射与原普通右侧固件一致，保留 USB 校准和 15 分钟深睡。三个目标也通过 Win/Mac 的 20 层、34 键位、24 组合键校验。产物位于 `zmk-local/firmware/right-cirque-check/`；实机触摸、方向、BLE 转发及续航仍需验证。
