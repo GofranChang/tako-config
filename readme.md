@@ -123,6 +123,8 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 右侧通过 BLE split input 通道 `0` 转发鼠标事件；左主和 dongle 的既有输出均通过 `tako_cirque_receiver` 附加 shield 加入接收配置，只有新增右侧一种 UF2，但**第一次使用也必须更新对应主设备**，旧主设备固件无法处理触控板数据。同拓扑更新不需要清绑定或重新校准；若从左主切到 dongle，仍按下文流程更换绑定。
 
+光标移动在接收端按 **1.5 倍（3/2）**缩放，配置位于 `tako_cirque_receiver.overlay` 的 `input-processors = <&zip_xy_scaler 3 2>`。仅处理相对 X/Y，保留小数余量；不改变轻触点击、滚轮或硬件 ADC 灵敏度。调整速度后需更新实际使用的主设备：左侧 USB 模式刷左主固件，dongle 模式刷 dongle；右侧不需因速度调整再次刷写。
+
 右侧当前安装方向启用 `x-invert`，仅反转水平移动，保持上下方向；`rotate-90` 和 `y-invert` 未启用。直线上滑时的侧偏仍需实测，单轴反转不等于角度补偿。
 
 保留右侧 15 分钟深度睡眠和实体 reset 恢复方式。无右屏后，电量可从支持外围电量的主设备界面查看。安装后的实际坐标方向和续航需实测；方向不对时在 `tako_cirque_right.overlay` 的 `trackpad@2a` 节点调整 `rotate-90`、`x-invert` 或 `y-invert`，不要修改 SDA/SCL 接线。
