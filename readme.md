@@ -102,6 +102,10 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 使用已在 PandaKB 上验证的五针转接 PCB，替换右侧 nice!view。新增 `tako_right_cirque.uf2`；原有六个输出保留。驱动固定为 `petejohanson/cirque-input-module@0de55f36bc720b5be3d8880dc856d4d78baf5214`，与 [PandaKB 已验证分支](https://github.com/GofranChang/zmk-for-PandaKB/tree/codex/cirque-i2c) 相同，沿用 100 kHz、地址 `0x2a`、默认方向/灵敏度和轻触点击设置。此次未增加手势滚动或自动鼠标层。
 
+当前独立适配分支：`codex/tako-right-cirque`，基于 `codex/tako-win-mac` 的 `5faa605` 创建。该基线已经包含右侧 Cirque 和两个接收端；本分支核对 PandaKB 的 GPIO/I²C/split input 配置，并显式固定 GPIO 依赖、引脚头文件及原有默认灵敏度 `sensitivity = "1x"`。
+
+本次使用的触控板为 **TM040040-2024-303（40 mm 凹面，标记 FEB 26）**。固定驱动不提供 QMK 的 `CIRQUE_PINNACLE_CURVED_OVERLAY` 或直径宏；不要把 QMK 设置直接写进 ZMK。`1x` 是 ADC 衰减设置，不是鼠标速度；保持与 PandaKB 原有驱动默认值一致。移动、轻触点击、边缘跟踪及悬停误触仍需装机验证。
+
 | 转接板信号 | 原右侧 nice!view 信号 | nice!nano GPIO |
 | --- | --- | --- |
 | SDA | MOSI | P0.17 |
@@ -120,6 +124,8 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 右侧通过 BLE split input 通道 `0` 转发鼠标事件；左主和 dongle 的既有输出均通过 `tako_cirque_receiver` 附加 shield 加入接收配置，只有新增右侧一种 UF2，但**第一次使用也必须更新对应主设备**，旧主设备固件无法处理触控板数据。同拓扑更新不需要清绑定或重新校准；若从左主切到 dongle，仍按下文流程更换绑定。
 
 保留右侧 15 分钟深度睡眠和实体 reset 恢复方式。无右屏后，电量可从支持外围电量的主设备界面查看。安装后的实际坐标方向和续航需实测；方向不对时在 `tako_cirque_right.overlay` 的 `trackpad@2a` 节点调整 `rotate-90`、`x-invert` 或 `y-invert`，不要修改 SDA/SCL 接线。
+
+2026-10-25：在独立分支重新完整编译 `tako_right_cirque`、`tako_left_central`、`tako_dongle`，三个目标均通过。检查本次生成的 `.config` 和 EDT：右侧 I²C0 为 100 kHz/0x2a，SDA=P0.17、SCL=P0.20、DR=P0.09 高电平有效，灵敏度 1x，显示关闭；左右主/从及 dongle 共用 split input 通道 0。右侧完整 kscan、ec_mux 和矩阵映射与原普通右侧固件一致，保留 USB 校准和 15 分钟深睡。三个目标也通过 Win/Mac 的 20 层、34 键位、24 组合键校验。产物位于 `zmk-local/firmware/right-cirque-check/`；实机触摸、方向、BLE 转发及续航仍需验证。
 
 ## 输出切换、屏幕与符号层
 

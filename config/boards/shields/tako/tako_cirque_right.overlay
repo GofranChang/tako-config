@@ -1,7 +1,9 @@
 /* Add after tako_right, without nice_view/nice_view_custom.
  * Reuse its display socket: MOSI -> SDA, SCK -> SCL, CS -> DR.
  */
+#include <zephyr/dt-bindings/gpio/gpio.h>
 #include <zephyr/dt-bindings/i2c/i2c.h>
+#include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
 #include "tako-cirque-split.dtsi"
 
 &tako_cirque_split {
@@ -42,5 +44,9 @@
         reg = <0x2a>;
         status = "okay";
         dr-gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
+        /* Match PandaKB's pinned driver default; suitable starting point for
+         * TM040040-2024-303 with the concave overlay. This is ADC attenuation,
+         * not cursor speed. Validate tracking/hover on the assembled keyboard. */
+        sensitivity = "1x";
     };
 };
