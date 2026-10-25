@@ -129,6 +129,8 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 2026-10-25：增大栈后仍有“滑动后触控板及按键一起失效、动画继续”的反馈，尚未确定根因。新增可选 [dongle 屏幕诊断 shield](docs/dongle-diagnostics.md)，用于观察事件转发、BLE 连接和 USB 上报计数；默认七种固件不启用诊断界面。
 
+针对“连接仍在但触控板事件停止”的反馈，右半 Cirque 读取已移至独立工作队列，避免阻塞蓝牙 TX 资源回收所在的系统工作队列。只作用于 `tako_cirque_right`；本次需刷右半固件，dongle 可继续使用诊断版。构建验证已通过，实机修复效果仍待确认；具体机制与验证见上述诊断文档。
+
 右侧当前安装方向启用 `x-invert`，仅反转水平移动，保持上下方向；`rotate-90` 和 `y-invert` 未启用。直线上滑时的侧偏仍需实测，单轴反转不等于角度补偿。
 
 保留右侧 15 分钟深度睡眠和实体 reset 恢复方式。无右屏后，电量可从支持外围电量的主设备界面查看。安装后的实际坐标方向和续航需实测；方向不对时在 `tako_cirque_right.overlay` 的 `trackpad@2a` 节点调整 `rotate-90`、`x-invert` 或 `y-invert`，不要修改 SDA/SCL 接线。
