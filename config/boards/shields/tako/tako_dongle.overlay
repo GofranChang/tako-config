@@ -27,10 +27,12 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <63>;
-        segment-remap;
-        com-invdir;
+        /* Reverse both scan axes: 180 degrees relative to the original
+         * segment-remap + com-invdir mounting. Keep colour inversion below. */
+        /delete-property/ segment-remap;
+        /delete-property/ com-invdir;
         prechargep = <0x22>;
-        /* Flip the entire framebuffer, including bitmap widgets. */
+        /* Invert colours for the entire framebuffer, including bitmap widgets. */
         inversion-on;
     };
 };

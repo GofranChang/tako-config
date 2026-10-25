@@ -134,7 +134,7 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 ## 输出切换、屏幕与符号层
 
 - Media 层实体 `/` 键（原 `u_out_tog` 位置）直接切换 USB / 蓝牙输出，按住 Shift 也能切换。先将主设备（dongle 或左主）与目标电脑配对，并选择对应蓝牙配置；蓝牙未连接时，ZMK 会回退到可用的 USB 输出。从设备的 USB 仍用于充电和校准。
-- dongle 的 SH1106 OLED 使用 `inversion-on` 整体翻转原有配色，位图小组件也一起翻转。
+- dongle 的 SH1106 OLED 相对原安装方向旋转 **180°**：同时关闭 `segment-remap` 和 `com-invdir`，整屏文字和位图一起旋转；`inversion-on` 仍保留，用于整体反色。
 - 所有 Tako 屏幕在 USB 供电时持续显示，即使选择蓝牙输出也不熄屏。插入 USB 会唤醒空闲屏幕，拔掉后恢复按活动状态熄屏；电池供电时，幻灯片从设备在空闲状态继续每 20 秒换图，直到原有 15 分钟深度睡眠；其他显示仍按活动状态省电。
 - Sym 层（长按右侧 Enter 拇指键）：实体 `I` 输出 `Esc`，`,` 输出 `(`，`.` 输出 `)`；Base 层不变。
 - `config/boards/shields/tako/usb_display.c` 统一管理屏幕熄屏，保持 `CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n`，避免上游的空闲监听器同时控制屏幕。该实现使用固定 ZMK v0.3 的显示刷新定时器。
@@ -142,7 +142,7 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 ## OLED 与依赖
 
-OLED 配置逐项参照 TOTEM 的 `totem_dongle.overlay`：`pro_micro_i2c`（nice!nano SDA=P0.17、SCL=P0.20）、地址 0x3c、SH1106、128×64、segment-offset=2、multiplex-ratio=63、segment-remap、com-invdir、prechargep=0x22。电源接法沿用同款硬件。
+OLED 配置逐项参照 TOTEM 的 `totem_dongle.overlay`：`pro_micro_i2c`（nice!nano SDA=P0.17、SCL=P0.20）、地址 0x3c、SH1106、128×64、segment-offset=2、multiplex-ratio=63、prechargep=0x22。本分支为适配实际屏幕安装方向，同时关闭参考配置中的 `segment-remap` 和 `com-invdir`，实现相对参考方向旋转 180°；电源接法沿用同款硬件。
 
 dongle 使用 `englmaxi/zmk-dongle-display` 的 v0.3 兼容提交 `c6c4be11c5ede722086a2a1f355cec9c101b9390`，提供两半数字电量、层、连接、修饰键和猫动画等状态。电量来源编号按外围设备的配对槽位确定；首次配对先启动左半，再启动右半。
 
