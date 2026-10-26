@@ -6,8 +6,8 @@ manifest:
       url-base: https://github.com/GofranChang
     - name: englmaxi
       url-base: https://github.com/englmaxi
-    - name: petejohanson
-      url-base: https://github.com/petejohanson
+    - name: geeksville
+      url-base: https://github.com/geeksville
     - name: gpeye
       url-base: https://github.com/GPeye
   projects:
@@ -24,9 +24,9 @@ manifest:
     - name: hammerbeam-slideshow
       remote: gpeye
       revision: 9c16436efa4c87d19e2e4558927969c7ddd5851d
-    # Same Pinnacle driver commit as the verified PandaKB Cirque configuration.
+    # Toucan driver plus its single DR error-path re-arm fix (upstream PR #5).
     - name: cirque-input-module
-      remote: petejohanson
-      revision: 0de55f36bc720b5be3d8880dc856d4d78baf5214
+      remote: geeksville
+      revision: 7b8df832185c779e63ad6d43c49ed1537ea8e9e0
   self:
     path: config

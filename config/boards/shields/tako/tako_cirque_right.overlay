@@ -44,7 +44,7 @@
         reg = <0x2a>;
         status = "okay";
         dr-gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
-        /* Match PandaKB's pinned driver default; suitable starting point for
+        /* Retain Tako's original 1x setting with the Toucan driver, for
          * TM040040-2024-303 with the concave overlay. This is ADC attenuation,
          * not cursor speed. Validate tracking/hover on the assembled keyboard. */
         sensitivity = "1x";

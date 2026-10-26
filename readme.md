@@ -100,7 +100,7 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 ## 右侧 Cirque 触控板
 
-使用已在 PandaKB 上验证的五针转接 PCB，替换右侧 nice!view。新增 `tako_right_cirque.uf2`；原有六个输出保留。驱动固定为 `petejohanson/cirque-input-module@0de55f36bc720b5be3d8880dc856d4d78baf5214`，与 [PandaKB 已验证分支](https://github.com/GofranChang/zmk-for-PandaKB/tree/codex/cirque-i2c) 相同，沿用 100 kHz、地址 `0x2a`、默认方向/灵敏度和轻触点击设置。此次未增加手势滚动或自动鼠标层。
+使用已在 PandaKB 上验证的五针转接 PCB，替换右侧 nice!view。新增 `tako_right_cirque.uf2`；原有六个输出保留。当前驱动固定为 [`geeksville/cirque-input-module@7b8df832185c779e63ad6d43c49ed1537ea8e9e0`](https://github.com/geeksville/cirque-input-module/commit/7b8df832185c779e63ad6d43c49ed1537ea8e9e0)：它是 [Toucan 所用分支](https://github.com/beekeeb/zmk-keyboard-toucan/blob/7154e0187128e493cd15785a18af1546419d5bb1/config/west.yml) 的 `effec100` 基础，加一笔尚未合入该分支的 [DR 错误路径重新启用补丁（PR #5）](https://github.com/geeksville/cirque-input-module/pull/5)。该驱动本身支持 I²C；Tako 继续用 100 kHz、地址 `0x2a`、1x 灵敏度、`x-invert` 方向和相对坐标模式，未增加手势滚动或自动鼠标层。
 
 当前独立适配分支：`codex/tako-right-cirque`，基于 `codex/tako-win-mac` 的 `5faa605` 创建。该基线已经包含右侧 Cirque 和两个接收端；本分支核对 PandaKB 的 GPIO/I²C/split input 配置，并显式固定 GPIO 依赖、引脚头文件及原有默认灵敏度 `sensitivity = "1x"`。
 
@@ -130,6 +130,10 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 2026-10-25：增大栈后仍有“滑动后触控板及按键一起失效、动画继续”的反馈，尚未确定根因。新增可选 [dongle 屏幕诊断 shield](docs/dongle-diagnostics.md)，用于观察事件转发、BLE 连接和 USB 上报计数；默认七种固件不启用诊断界面。
 
 针对“连接仍在但触控板事件停止”的反馈，右半 Cirque 读取已移至独立工作队列，避免阻塞蓝牙 TX 资源回收所在的系统工作队列。只作用于 `tako_cirque_right`；本次需刷右半固件，dongle 可继续使用诊断版。构建验证已通过，实机修复效果仍待确认；具体机制与验证见上述诊断文档。
+
+2026-10-26：切换到上述 Toucan 同源驱动，DR 由边沿触发改为电平触发；中断回调先屏蔽 DR，读取后重新启用，读失败路径也会重新启用。保留独立 Cirque 工作队列，避免重新引入系统工作队列阻塞。GPIO、EC 触发/校准、1.5 倍接收端缩放和 15 分钟睡眠配置保持原值；触控板自动休眠未开启。新驱动在设备挂起时增加了硬件 shutdown 支持，实机睡眠/唤醒及延迟效果仍需验证。只需更新右半；如曾刷 `latency=0` 对照 dongle，建议同时恢复普通 dongle（默认 latency=30）以单独比较驱动。
+
+本次右半、dongle、左主均完整编译通过。检查生成配置：右半使用 I²C 100 kHz / 0x2a、DR P0.09 高有效，相对模式、1x 和水平反转；右半 `.config`、完整 EC kscan/mux 节点与切换前相同。独立工作队列的编译头仅作用于 Pinnacle 源文件；两个接收端保留 1.5 倍缩放、BLE latency=30。产物在 `zmk-local/firmware/toucan-i2c/`。
 
 右侧当前安装方向启用 `x-invert`，仅反转水平移动，保持上下方向；`rotate-90` 和 `y-invert` 未启用。直线上滑时的侧偏仍需实测，单轴反转不等于角度补偿。
 
