@@ -1,0 +1,43 @@
+include_guard(GLOBAL)
+
+# Sweep-Pro uses a newer endpoint API and Zephyr's 3-argument input callback.
+# Generate API-only adapters so the pinned driver remains untouched and ZMK,
+# the EC module and both display modules can stay on their tested v0.3 base.
+function(tako_nxtkb_v03_compat)
+  get_target_property(sources app SOURCES)
+  set(adapted "")
+  set(adapter_count 0)
+  foreach(source IN LISTS sources)
+    if(NOT CONFIG_ZMK_POINTING AND source MATCHES "/cirque-input-module/src/")
+      # settings_reset has no pointing devices or behaviors; upstream adds
+      # helper sources unconditionally, so omit them in that target only.
+      continue()
+    endif()
+    if(source MATCHES "/cirque-input-module/src/(behaviors/behavior_(pointing_speed|cirque_mode)|input_processor_drag_scroll)\\.c$")
+      file(READ "${source}" content)
+      if(source MATCHES "behavior_pointing_speed")
+        string(REPLACE "zmk_endpoint_get_selected()" "zmk_endpoints_selected()" content "${content}")
+      elseif(source MATCHES "input_processor_drag_scroll")
+        string(REPLACE "zmk_endpoint_send_mouse_report()" "zmk_endpoints_send_mouse_report()" content "${content}")
+      else()
+        string(REPLACE "struct input_event *evt, void *user_data)" "struct input_event *evt)" content "${content}")
+        string(REPLACE "ARG_UNUSED(user_data);" "" content "${content}")
+        string(REPLACE "INPUT_CALLBACK_DEFINE(NULL, cirque_mode_status_input_listener, NULL);"
+                       "INPUT_CALLBACK_DEFINE(NULL, cirque_mode_status_input_listener);" content "${content}")
+      endif()
+      get_filename_component(name "${source}" NAME)
+      set(output "${PROJECT_BINARY_DIR}/tako-nxtkb-compat/${name}")
+      file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tako-nxtkb-compat")
+      file(WRITE "${output}" "/* Generated ZMK v0.3 API adapter. */\n${content}")
+      list(APPEND adapted "${output}")
+      math(EXPR adapter_count "${adapter_count} + 1")
+    else()
+      list(APPEND adapted "${source}")
+    endif()
+  endforeach()
+  if(CONFIG_ZMK_POINTING AND NOT adapter_count EQUAL 3)
+    message(FATAL_ERROR "Expected exactly three nxtkb v0.3 API adapters")
+  endif()
+  set_property(TARGET app PROPERTY SOURCES "${adapted}")
+endfunction()
+cmake_language(DEFER DIRECTORY "${ZEPHYR_BASE}" CALL tako_nxtkb_v03_compat)

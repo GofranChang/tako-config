@@ -100,11 +100,11 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 ## 右侧 Cirque 触控板
 
-使用已在 PandaKB 上验证的五针转接 PCB，替换右侧 nice!view。新增 `tako_right_cirque.uf2`；原有六个输出保留。当前驱动固定为 [`geeksville/cirque-input-module@7b8df832185c779e63ad6d43c49ed1537ea8e9e0`](https://github.com/geeksville/cirque-input-module/commit/7b8df832185c779e63ad6d43c49ed1537ea8e9e0)：它是 [Toucan 所用分支](https://github.com/beekeeb/zmk-keyboard-toucan/blob/7154e0187128e493cd15785a18af1546419d5bb1/config/west.yml) 的 `effec100` 基础，加一笔尚未合入该分支的 [DR 错误路径重新启用补丁（PR #5）](https://github.com/geeksville/cirque-input-module/pull/5)。该驱动本身支持 I²C；Tako 继续用 100 kHz、地址 `0x2a`、1x 灵敏度、`x-invert` 方向和相对坐标模式，未增加手势滚动或自动鼠标层。
+当前分支 `codex/tako-sweep-pro-cirque` 采用 [Sweep-Pro 的固定版本](https://github.com/nxtkb/Sweep-Pro/tree/9bf146cafbde166aef42b2a6f4ba3f7c1acd8a84)，使用同一驱动 [nxtkb/cirque-input-module@8af03a4](https://github.com/nxtkb/cirque-input-module/tree/8af03a4c061580c14ec8745caf0fa2dd3fc7f042)。右侧触控板替换 nice!view，左侧 nice!view 保留。七种固件输出不变。
 
-当前独立适配分支：`codex/tako-right-cirque`，基于 `codex/tako-win-mac` 的 `5faa605` 创建。该基线已经包含右侧 Cirque 和两个接收端；本分支核对 PandaKB 的 GPIO/I²C/split input 配置，并显式固定 GPIO 依赖、引脚头文件及原有默认灵敏度 `sensitivity = "1x"`。
+### 接线与刷写
 
-本次使用的触控板为 **TM040040-2024-303（40 mm 凹面，标记 FEB 26）**。固定驱动不提供 QMK 的 `CIRQUE_PINNACLE_CURVED_OVERLAY` 或直径宏；不要把 QMK 设置直接写进 ZMK。`1x` 是 ADC 衰减设置，不是鼠标速度；保持与 PandaKB 原有驱动默认值一致。移动、轻触点击、边缘跟踪及悬停误触仍需装机验证。
+继续使用已验证的五针转接 PCB 和 TM040040-2024-303（40 mm 凹面）；不需要改接线。
 
 | 转接板信号 | 原右侧 nice!view 信号 | nice!nano GPIO |
 | --- | --- | --- |
@@ -114,32 +114,54 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 | GND | GND | GND |
 | DR | CS | **P0.09**，高电平有效 |
 
-注意：PandaKB 的 DR 为 P0.08，Tako 右侧是 **P0.09**，不能原样照抄。Cirque 本体需已移除 I²C 模式选择电阻；保留转接板的两个 4.7 kΩ SDA/SCL 上拉。附加 shield `tako_cirque_right` 关闭右侧 SPI1 和显示，启用 I²C0；不与 `nice_view` 或 `nice_view_custom` 同时使用。EC 矩阵、MUX、ADC、50% 触发、校准存储和串口保持原配置。
+I²C 使用 100 kHz / 地址 `0x2a`，右侧 SPI1 和显示关闭。Cirque 本体需已切到 I²C；转接板保留 SDA/SCL 的两个 4.7 kΩ 上拉。参考 Sweep-Pro 的 GPIO 不适用于 Tako。
 
 | 使用方式 | 左侧 | 右侧 | dongle |
 | --- | --- | --- | --- |
-| 左半 USB、右半 BLE | **本次更新后的** `tako_left_central.uf2` | `tako_right_cirque.uf2` | 不参与 |
-| dongle USB、两半 BLE | `tako_left_dongle.uf2` | `tako_right_cirque.uf2` | **本次更新后的** `tako_dongle.uf2` |
+| 左半 USB、右半 BLE | `tako_left_central.uf2` | `tako_right_cirque.uf2` | 不参与 |
+| dongle USB、两半 BLE | `tako_left_dongle.uf2` | `tako_right_cirque.uf2` | `tako_dongle.uf2` |
 
-右侧通过 BLE split input 通道 `0` 转发鼠标事件；左主和 dongle 的既有输出均通过 `tako_cirque_receiver` 附加 shield 加入接收配置，只有新增右侧一种 UF2，但**第一次使用也必须更新对应主设备**，旧主设备固件无法处理触控板数据。同拓扑更新不需要清绑定或重新校准；若从左主切到 dongle，仍按下文流程更换绑定。
+请将所用拓扑的整套固件更新到此版本，接收端也需要新的速度处理器、键位和模式切换行为。相同拓扑更新无需清绑定、无需重新校准；若切换主设备，按原流程重新绑定。右侧 EC 仍需已有有效校准才能正常打字。
 
-光标移动在接收端按 **1.5 倍（3/2）**缩放，配置位于 `tako_cirque_receiver.overlay` 的 `input-processors = <&zip_xy_scaler 3 2>`。仅处理相对 X/Y，保留小数余量；不改变轻触点击、滚轮或硬件 ADC 灵敏度。调整速度后需更新实际使用的主设备：左侧 USB 模式刷左主固件，dongle 模式刷 dongle；右侧不需因速度调整再次刷写。
+### 手势与速度
 
-接收端（dongle 和左主）的输入线程栈固定为 2048 字节。原默认值为 512 字节；本地编译器栈报告与反汇编显示，输入回调到 USB HID/驱动内核的一条调用路径累计约 440 字节，尚未计入部分汇编及上下文开销，余量偏小。增大栈用于排查接收端停止响应；目前没有崩溃日志，不能确认断联根因或宣称已解决。此调整只需更新正在使用的接收端，不需重刷右半或清除绑定；右半 EC 按键仍须单独完成校准。
+完整沿用 Sweep-Pro 的触控板参数：默认绝对坐标模式、`2x` ADC 灵敏度、坐标换算 `3/10`、自适应指针曲线（死区 2、加速 1/12、最大 delta 120）、滚动换算 `1/8`，初始运行速度均为 `1x`。不再叠加旧版本的 1.5 倍 XY 缩放；`2x` 是 ADC 设置，并不代表光标速度翻倍。
 
-2026-10-25：增大栈后仍有“滑动后触控板及按键一起失效、动画继续”的反馈，尚未确定根因。新增可选 [dongle 屏幕诊断 shield](docs/dongle-diagnostics.md)，用于观察事件转发、BLE 连接和 USB 上报计数；默认七种固件不启用诊断界面。
+- 轻触：左键；右下角轻触：右键（角落区 520 × 420，按驱动坐标计算）。
+- 双击后第二次保持触摸并移动：拖拽；再次触摸时间窗 300 ms，开始移动后才按下左键。
+- 从逻辑右边缘开始上下滑动：竖向滚动；边缘区 130，滚动除数 80。
+- 手指停在边缘：120 ms 后自动继续移动光标，离开边缘或抬手停止。此行为是参考配置启用的边缘移动。
+- Mouse 层按住左侧 Space 位置，再滑动：横向/竖向滚动。
 
-针对“连接仍在但触控板事件停止”的反馈，右半 Cirque 读取已移至独立工作队列，避免阻塞蓝牙 TX 资源回收所在的系统工作队列。只作用于 `tako_cirque_right`；本次需刷右半固件，dongle 可继续使用诊断版。构建验证已通过，实机修复效果仍待确认；具体机制与验证见上述诊断文档。
+没有额外开启参考工程未启用的上边缘横向滚动、角落中键或惯性滑动。保留 Tako 水平反转 `invert-x`；参考的 `invert-y` 也保留，但该驱动在绝对模式忽略它。角落与边缘位置仍需按实际安装方向确认。
 
-2026-10-26：切换到上述 Toucan 同源驱动，DR 由边沿触发改为电平触发；中断回调先屏蔽 DR，读取后重新启用，读失败路径也会重新启用。保留独立 Cirque 工作队列，避免重新引入系统工作队列阻塞。GPIO、EC 触发/校准、1.5 倍接收端缩放和 15 分钟睡眠配置保持原值；触控板自动休眠未开启。新驱动在设备挂起时增加了硬件 shutdown 支持，实机睡眠/唤醒及延迟效果仍需验证。只需更新右半；如曾刷 `latency=0` 对照 dongle，建议同时恢复普通 dongle（默认 latency=30）以单独比较驱动。
+### Mouse 层入口
 
-本次右半、dongle、左主均完整编译通过。检查生成配置：右半使用 I²C 100 kHz / 0x2a、DR P0.09 高有效，相对模式、1x 和水平反转；右半 `.config`、完整 EC kscan/mux 节点与切换前相同。独立工作队列的编译头仅作用于 Pinnacle 源文件；两个接收端保留 1.5 倍缩放、BLE latency=30。产物在 `zmk-local/firmware/toucan-i2c/`。
+长按左侧 **Tab** 进入 Mouse 层，以下按键按 Base 层的实体位置查找；Win/Mac Mouse 层一致。只填入原来的空位，原有 Miryoku 鼠标移动、滚轮、修饰键、剪贴板、组合键和 Base 层 Z/X 长按功能保留。
 
-右侧当前安装方向启用 `x-invert`，仅反转水平移动，保持上下方向；`rotate-90` 和 `y-invert` 未启用。直线上滑时的侧偏仍需实测，单轴反转不等于角度补偿。
+| 实体位置 | Mouse 层功能 |
+| --- | --- |
+| 左 Space（按住） | 滑动改滚动；松开恢复移动 |
+| Z / B | 指针减速 / 加速 |
+| `'` / `/` | 滚动减速 / 加速 |
+| T | 指针和滚动速度一起恢复 `1x` |
+| G | 切换绝对 / 相对模式；切换时先抬手 |
 
-保留右侧 15 分钟深度睡眠和实体 reset 恢复方式。无右屏后，电量可从支持外围电量的主设备界面查看。安装后的实际坐标方向和续航需实测；方向不对时在 `tako_cirque_right.overlay` 的 `trackpad@2a` 节点调整 `rotate-90`、`x-invert` 或 `y-invert`，不要修改 SDA/SCL 接线。
+速度每次细调 `0.01x`，按住连续调整。指针范围 `0.1x–4x`，滚动范围 `0.1x–10x`；速度按 USB 和各 BLE 主机配置分别保存，模式切换也会保存。绝对模式的软件手势与相对模式的芯片原生行为不同；再次按 G 可切回。
 
-2026-10-25：在独立分支重新完整编译 `tako_right_cirque`、`tako_left_central`、`tako_dongle`，三个目标均通过。检查本次生成的 `.config` 和 EDT：右侧 I²C0 为 100 kHz/0x2a，SDA=P0.17、SCL=P0.20、DR=P0.09 高电平有效，灵敏度 1x，显示关闭；左右主/从及 dongle 共用 split input 通道 0。右侧完整 kscan、ec_mux 和矩阵映射与原普通右侧固件一致，保留 USB 校准和 15 分钟深睡。三个目标也通过 Win/Mac 的 20 层、34 键位、24 组合键校验。产物位于 `zmk-local/firmware/right-cirque-check/`；实机触摸、方向、BLE 转发及续航仍需验证。
+### 实现与验证
+
+传感器参数在 `tako_cirque_right.overlay`，速度处理器与行为在 `tako-sweep-pro-processors.dtsi`，接收端 pipeline 在 `tako_cirque_receiver.overlay`。右侧和接收端沿用参考工程的输入队列 64、行为队列 512、主线程/系统工作队列栈各 8192、堆 16384、输入栈 4096、关闭 2M PHY、开启实验连接参数及 +8 dBm；接收端启用平滑滚动和 64 项 BLE 鼠标队列。
+
+保留 Tako 的 EC 矩阵、MUX/ADC、50% 触发、校准串口、15 分钟睡眠与 reset 恢复方式，以及 dongle OLED 的 180° 方向。没有照搬 Sweep-Pro 的禁用睡眠或 Z/X 长按键位。新驱动没有旧 Toucan 驱动的设备挂起关断实现，休眠时触控板本体的电流需实测。
+
+ZMK 保持 v0.3，EC 和显示模块保持原版本。仓库根目录注册 Zephyr 模块，通过 `nxtkb_v03_compat.cmake` 在构建目录生成三处 API 兼容副本（endpoint 命名及输入回调签名），不修改固定驱动源码和手势算法；reset 固件跳过无关的驱动辅助源码。GitHub Actions v0.3 工作流会自动发现根目录模块，本地构建也需将本仓库加入 `ZMK_EXTRA_MODULES`。
+
+旧驱动的独立 Cirque 工作队列补丁随迁移移除；新驱动原生使用 `K_NO_WAIT` 上报输入。可选的 [dongle 诊断屏幕](docs/dongle-diagnostics.md) 仍保留。构建与键位验证不能代替实机测试；偶发延迟、方向、边缘手势和续航请刷整套后确认。
+
+七种固件已完整本地编译通过。最终 EDT 与旧版本对比确认：18 个非 Mouse 层和全部组合键不变，两个 Mouse 层各只填入七个原空位；EC kscan、MUX 和矩阵映射不变。传感器逐项匹配参考配置（保留 Tako 的引脚和水平反转），两个接收端的处理器参数与输入通道已核对。
+
+本地七种 UF2 位于 `../zmk-local/firmware/sweep-pro/`。本分支仅本地提交，尚未推送或验证远程 Actions。
 
 ## 输出切换、屏幕与符号层
 

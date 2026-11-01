@@ -32,7 +32,7 @@
 };
 
 &i2c0 {
-    compatible = "nordic,nrf-twi";
+    compatible = "nordic,nrf-twim";
     status = "okay";
     clock-frequency = <I2C_BITRATE_STANDARD>;
     pinctrl-0 = <&tako_cirque_i2c_default>;
@@ -40,15 +40,37 @@
     pinctrl-names = "default", "sleep";
 
     tako_cirque: trackpad@2a {
-        compatible = "cirque,pinnacle";
+        compatible = "cirque,pinnacle2";
         reg = <0x2a>;
         status = "okay";
-        dr-gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
-        /* Retain Tako's original 1x setting with the Toucan driver, for
-         * TM040040-2024-303 with the concave overlay. This is ADC attenuation,
-         * not cursor speed. Validate tracking/hover on the assembled keyboard. */
-        sensitivity = "1x";
-        /* Mounted orientation: reverse horizontal movement only. */
-        x-invert;
+        data-ready-gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
+        sensitivity = "2x";
+        data-mode = "absolute";
+        idle-packets-count = <3>;
+        absolute-touch-min-z = <12>;
+        absolute-relative-multiplier = <3>;
+        absolute-relative-divisor = <10>;
+        absolute-tap-click-ms = <30>;
+        absolute-tap-drag-enable;
+        absolute-tap-drag-timeout-ms = <300>;
+        absolute-tap-drag-max-movement = <160>;
+        absolute-secondary-tap-area-width = <520>;
+        absolute-secondary-tap-area-height = <420>;
+        absolute-aux-tap-area-width = <0>;
+        absolute-aux-tap-area-height = <0>;
+        absolute-edge-motion-enable;
+        absolute-edge-motion-zone = <80>;
+        absolute-edge-motion-speed = <4>;
+        absolute-edge-motion-interval-ms = <10>;
+        absolute-edge-motion-start-ms = <120>;
+        absolute-right-edge-scroll-enable;
+        absolute-scroll-zone = <130>;
+        absolute-scroll-divisor = <80>;
+        startup-delay-ms = <1500>;
+        primary-tap-enable;
+        glide-extend-enable;
+        invert-y;
+        /* Preserve Tako horizontal mounting orientation. */
+        invert-x;
     };
 };

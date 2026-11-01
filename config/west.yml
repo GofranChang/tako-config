@@ -6,8 +6,8 @@ manifest:
       url-base: https://github.com/GofranChang
     - name: englmaxi
       url-base: https://github.com/englmaxi
-    - name: geeksville
-      url-base: https://github.com/geeksville
+    - name: nxtkb
+      url-base: https://github.com/nxtkb
     - name: gpeye
       url-base: https://github.com/GPeye
   projects:
@@ -24,9 +24,9 @@ manifest:
     - name: hammerbeam-slideshow
       remote: gpeye
       revision: 9c16436efa4c87d19e2e4558927969c7ddd5851d
-    # Toucan driver plus its single DR error-path re-arm fix (upstream PR #5).
+    # Same Cirque driver revision as nxtkb/Sweep-Pro at 9bf146c.
     - name: cirque-input-module
-      remote: geeksville
-      revision: 7b8df832185c779e63ad6d43c49ed1537ea8e9e0
+      remote: nxtkb
+      revision: 8af03a4c061580c14ec8745caf0fa2dd3fc7f042
   self:
     path: config

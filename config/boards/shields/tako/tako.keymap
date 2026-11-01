@@ -1,3 +1,4 @@
+#include "tako-sweep-pro-processors.dtsi"
 /*
  * Copyright (c) 2020 The ZMK Contributors
  *

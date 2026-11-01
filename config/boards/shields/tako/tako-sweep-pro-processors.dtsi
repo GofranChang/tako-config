@@ -1,0 +1,52 @@
+/* Sweep-Pro 9bf146c: pointer and scroll settings, unchanged. */
+#ifndef TAKO_SWEEP_PRO_PROCESSORS
+#define TAKO_SWEEP_PRO_PROCESSORS
+/ {
+    pointer_processor: pointer_processor {
+        compatible = "zmk,input-processor-pointer-speed";
+        #input-processor-cells = <2>;
+        track-remainders;
+        pointer-curve = "adaptive";
+        pointer-curve-deadzone = <2>;
+        pointer-curve-accel-multiplier = <1>;
+        pointer-curve-accel-divisor = <12>;
+        pointer-curve-max-delta = <120>;
+        one-x-multiplier = <1>;
+        one-x-divisor = <1>;
+        min-percent = <10>;
+        max-percent = <400>;
+        initial-speed-position = <50>;
+    };
+    drag_scroll_processor: drag_scroll_processor {
+        compatible = "zmk,input-processor-drag-scroll";
+        #input-processor-cells = <2>;
+        track-remainders;
+        native-wheel-axis = "horizontal-when-enabled";
+        scroll-min-step = <1>;
+        one-x-multiplier = <1>;
+        one-x-divisor = <1>;
+        min-percent = <10>;
+        max-percent = <1000>;
+        initial-speed-position = <50>;
+    };
+    behaviors {
+        tako_pointer_reset: tako_pointer_reset {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&ptr_spd 0 2>, <&ptr_spd 1 2>;
+        };
+        drgscrl: drag_scroll {
+            compatible = "zmk,behavior-drag-scroll";
+            #binding-cells = <0>;
+        };
+        ptr_spd: pointing_speed {
+            compatible = "zmk,behavior-pointing-speed";
+            #binding-cells = <2>;
+        };
+        crq_mode: cirque_mode {
+            compatible = "zmk,behavior-cirque-mode";
+            #binding-cells = <1>;
+        };
+    };
+};
+#endif

@@ -215,7 +215,7 @@ layers:
   - '&u_to_U_TAP'
   - '&u_to_U_EXTRA'
   - '&u_to_U_BASE'
-  - ''
+  - Reset Speeds
   - Ctl+Y
   - Ctl+V
   - Ctl+C
@@ -225,23 +225,23 @@ layers:
   - Alt
   - Ctrl
   - Shift
-  - ''
+  - Pad Mode
   - Mouse L
   - Mouse D
   - Mouse U
   - Mouse R
-  - ''
-  - ''
+  - Scroll -
+  - Pointer -
   - AltGr
   - '&u_to_U_SYM'
   - '&u_to_U_MOUSE'
-  - ''
+  - Pointer +
   - Scroll L
   - Scroll D
   - Scroll U
   - Scroll R
-  - ''
-  - ''
+  - Scroll +
+  - Hold Scroll
   - type: held
   - Mouse 2
   - Mouse 1
@@ -615,7 +615,7 @@ layers:
     h: 2x
   - t: Base
     h: 2x
-  - ''
+  - Reset Speeds
   - Sft+Gui+Z
   - Gui+V
   - Gui+C
@@ -625,25 +625,25 @@ layers:
   - Alt
   - Cmd
   - Shift
-  - ''
+  - Pad Mode
   - Mouse L
   - Mouse D
   - Mouse U
   - Mouse R
-  - ''
-  - ''
+  - Scroll -
+  - Pointer -
   - AltGr
   - t: Sym
     h: 2x
   - t: Mouse
     h: 2x
-  - ''
+  - Pointer +
   - Scroll L
   - Scroll D
   - Scroll U
   - Scroll R
-  - ''
-  - ''
+  - Scroll +
+  - Hold Scroll
   - type: held
   - Mouse 2
   - Mouse 1

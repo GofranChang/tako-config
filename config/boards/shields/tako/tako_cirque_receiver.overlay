@@ -1,10 +1,7 @@
-/* Receive the right-side Cirque on either existing central firmware. */
+/* Sweep-Pro processors on the actual central, including dongle. */
 #include "tako-cirque-split.dtsi"
-#include <input/processors/scaler.dtsi>
-
+#include "tako-sweep-pro-processors.dtsi"
 &tako_cirque_listener {
     status = "okay";
-    /* 1.5x pointer travel; receiver listeners preserve fractional remainders.
-     * Limit scaling to relative X/Y so taps and scroll events stay unchanged. */
-    input-processors = <&zip_xy_scaler 3 2>;
+    input-processors = <&pointer_processor 0 0 &drag_scroll_processor 1 8>;
 };
