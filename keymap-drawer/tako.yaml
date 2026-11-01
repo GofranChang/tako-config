@@ -231,7 +231,7 @@ layers:
   - Mouse U
   - Mouse R
   - Scroll -
-  - Pointer -
+  - Hold Scroll
   - AltGr
   - '&u_to_U_SYM'
   - '&u_to_U_MOUSE'
@@ -241,7 +241,7 @@ layers:
   - Scroll U
   - Scroll R
   - Scroll +
-  - Hold Scroll
+  - Pointer -
   - type: held
   - Mouse 2
   - Mouse 1
@@ -631,7 +631,7 @@ layers:
   - Mouse U
   - Mouse R
   - Scroll -
-  - Pointer -
+  - Hold Scroll
   - AltGr
   - t: Sym
     h: 2x
@@ -643,7 +643,7 @@ layers:
   - Scroll U
   - Scroll R
   - Scroll +
-  - Hold Scroll
+  - Pointer -
   - type: held
   - Mouse 2
   - Mouse 1
