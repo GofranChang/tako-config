@@ -72,7 +72,7 @@ west build zmk/app -d build/tako_dongle_diagnostics -b nice_nano_v2 -p always \
 
 ## 右侧画圈卡顿诊断（可选）
 
-当小圈移动也不连续、停手后不追着移动，先测量采样与传输，而不继续扩大队列或调整速度。额外 shield `tako_cirque_probe` 只供右侧 Cirque 使用，增加 `cirque_probe show/reset` 两个校准串口命令。默认 `build.yaml` 七种固件不启用它；不增加后台定时器，不改变触控参数、工作队列、BLE 参数或校准。每次输入只更新少量计数，发送包装函数只转发一次调用并保留返回值。
+当小圈移动也不连续、停手后不追着移动，先测量采样与传输，而不继续扩大队列或调整速度。额外 shield `tako_cirque_probe` 只供右侧 Cirque 使用，增加 `cirque_probe` 校准串口诊断命令。默认 `build.yaml` 七种固件不启用它；不增加后台定时器，默认不改变触控参数、工作队列、BLE 参数或校准；V2 的显式命令可以临时修改起步门槛及 BLE latency，重启还原。每次输入只更新少量计数，发送包装函数只转发一次调用并保留返回值。
 
 本地诊断产物：`../zmk-local/firmware/diagnostics/tako_right_cirque_probe.uf2`。只刷右半；dongle 和左半保持当前固件。**测试时 dongle 继续插着，右半同时用 USB 接到 Mac**，USB 仅用于读取校准串口，光标仍通过 dongle 输出。无需清绑定或重新校准。刷普通 `tako_right_cirque.uf2` 即可移除诊断。
 
@@ -91,7 +91,7 @@ west build zmk/app -d build/sweep-pro-cirque-probe -b nice_nano_v2 -p always \
 2. 在触控板中央连续画圈约 10 秒，不按 Mouse 层 Z，避免边缘自动移动干扰读数。
 3. 抬手后执行 `cirque_probe show`，保存输出。
 
-输出标记 `TAKO_CIRQUE_PROBE_V1` 也用于确认确实刷入了诊断固件。计数含义：
+输出标记 `TAKO_CIRQUE_PROBE_V2` 用于确认刷入支持运行时对照的诊断固件（旧 V1 仅支持计数）。计数含义：
 
 | 字段 | 含义 |
 | --- | --- |
@@ -106,3 +106,15 @@ west build zmk/app -d build/sweep-pro-cirque-probe -b nice_nano_v2 -p always \
 | feed / sample_rate_reg / read_rc | 芯片模式、采样率寄存器原值及读取结果；feed 的 bit1 为绝对模式标记 |
 
 这里只诊断到右半向 BLE 提交事件的路径。若读数正常而光标仍不连续，再使用 dongle 端计数核对接收和 USB 上报。
+
+### 起步和 BLE 延迟感对照（V2）
+
+只需更新右侧诊断固件一次，之后通过同一串口逐项测试。默认参数保持现有配置，以下改动均不写入设置或校准，重启右半即可恢复。
+
+- 手指抬起后执行 `cirque_probe tap20`：将软件轻触判定/光标起步位移门槛由 80 临时改为 20；速度、加速曲线及 BLE 参数不变。门槛降低可能让轻触点击更容易被识别成移动，需同时测试点击。`cirque_probe tap80` 恢复配置值。
+- 恢复门槛后执行 `cirque_probe latency0`：仅向已连接的 dongle 请求 peripheral latency=0，连接间隔和超时保持实际值。命令返回 0 仅表示请求成功，请随后执行 `cirque_probe show` 确认实际 latency 已变为 0。`cirque_probe latency30` 请求恢复当前基线 30。
+- latency=0 可能增加无线功耗；它是临时对照，不作为续航结论。起步门槛和 latency 必须分开改变、分开比较，避免无法归因。
+
+V2 还显示 `dispatch_gaps_us`（输入线程处理帧的间隔）和 `tx_wait_us`（每次提交的等待时间）分布。
+
+V2 的 `tap_movement_limit` 显示当前有效门槛，`BLE latency` 显示实际协商值。如果改变 latency 的请求失败，保留错误码，不将其视为已生效。
