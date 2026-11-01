@@ -141,3 +141,5 @@ V2 的 `tap_movement_limit` 显示当前有效门槛，`BLE latency` 显示实�
 `firmware/packed-motion/tako_right_cirque_probe.uf2` 使用标记 `TAKO_CIRQUE_PROBE_V3_PACKED_XY`，仍支持原来的 show/reset/tap20/tap80/latency0/latency30 命令。由于正式配置起步门槛已为20，tap80命令恢复的是当前配置值20，而不是旧版本80。
 
 V3 中每个私有运动事件计为一帧；仅移动时，queued 与 tx_events 应大致等于 generated_frames，不再约为两倍；点击、模式状态等事件会使数字略有差异。生成帧/处理帧的时间分布仍可比较。原 dongle 诊断屏的 M/I 也将按每个私有包计数，不能直接与旧版逐轴事件数比较。
+
+2026-11-01 V3 实机反馈：用户确认配套 X/Y 合包版本没有延迟、没有掉帧。随后仅增加 Mouse 层 A/G 滚动减速/加速，保持传输、缓冲和采样参数不变；该键位更新只需刷正在使用的接收端，已刷配套 V3 右侧可继续使用。
