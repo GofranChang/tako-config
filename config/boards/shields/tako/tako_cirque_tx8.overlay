@@ -1,0 +1,4 @@
+/* Keep the lower startup threshold confirmed in the runtime comparison. */
+&tako_cirque {
+    absolute-tap-max-movement = <20>;
+};

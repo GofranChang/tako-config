@@ -18,3 +18,6 @@ config SHIELD_TAKO_DONGLE_DIAGNOSTICS
 
 config SHIELD_TAKO_CIRQUE_PROBE
   def_bool $(shields_list_contains,tako_cirque_probe)
+
+config SHIELD_TAKO_CIRQUE_TX8
+  def_bool $(shields_list_contains,tako_cirque_tx8)

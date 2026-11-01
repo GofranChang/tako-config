@@ -118,3 +118,13 @@ west build zmk/app -d build/sweep-pro-cirque-probe -b nice_nano_v2 -p always \
 V2 还显示 `dispatch_gaps_us`（输入线程处理帧的间隔）和 `tx_wait_us`（每次提交的等待时间）分布。
 
 V2 的 `tap_movement_limit` 显示当前有效门槛，`BLE latency` 显示实际协商值。如果改变 latency 的请求失败，保留错误码，不将其视为已生效。
+
+### 实机结果与 TX8 对照
+
+2026-11-01：运行时对照确认，门槛 20 比 80 起步更跟手，但持续移动仍有延迟感。仅将实际 BLE latency 从 30 改为 0 没有明显改善，已恢复为 30。
+
+门槛 20 / latency 30 一轮中，1052 次发送有 40 次等待 32–64 ms，最长约 57.8 ms；526 个生成帧无队列丢弃。门槛 80 / latency 0 一轮中，3166 次发送有 154 次等待 32–64 ms、2 次超过 64 ms，最长约 112.5 ms，仍无队列丢弃。两个动作序列和时长不同，不能据此断言 latency=0 更差；但它没有消除发送等待。输入线程处理间隔明显不均，而传感器读取主要保持 8–16 ms，发送资源不足是下一项待验证假设。
+
+可选 `tako_cirque_tx8` shield 将 `BT_L2CAP_TX_BUF_COUNT`、`BT_BUF_ACL_TX_COUNT`、`BT_CONN_TX_MAX` 从 3 同时改为 8，并保留已确认改善起步的门槛 20；不改变 PHY、连接间隔、peripheral latency、采样率或应用事件队列。它只增加可用发送资源，不保证解决空中传输或接收端瓶颈。普通七份固件保持不变。
+
+诊断产物：`../zmk-local/firmware/diagnostics/tako_right_cirque_tx8.uf2`，只刷右半，保留 dongle 和 USB 诊断连接。由四个 shield 构建：`tako_right tako_cirque_right tako_cirque_probe tako_cirque_tx8`。刷后用 `cirque_probe show` 确认默认门槛 20、实际 latency 30，再清零计数做连续画圈比较。恢复原诊断版或普通右侧 Cirque UF2 即可撤销。
