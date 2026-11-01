@@ -69,6 +69,7 @@
         absolute-edge-motion-interval-ms = <10>;
         absolute-edge-motion-start-ms = <120>;
         absolute-right-edge-scroll-enable;
+        absolute-top-edge-scroll-enable;
         absolute-scroll-zone = <130>;
         absolute-scroll-divisor = <80>;
         startup-delay-ms = <1500>;
