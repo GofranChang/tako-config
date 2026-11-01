@@ -7,8 +7,8 @@
         #input-processor-cells = <2>;
         track-remainders;
         pointer-curve = "linear";
-        one-x-multiplier = <3>;
-        one-x-divisor = <2>;
+        one-x-multiplier = <7>;
+        one-x-divisor = <4>;
         min-percent = <10>;
         max-percent = <400>;
         initial-speed-position = <50>;

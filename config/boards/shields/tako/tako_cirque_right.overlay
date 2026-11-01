@@ -61,7 +61,7 @@
         /* Start on the logical right/top edge; lock the axis until lift. */
         absolute-right-edge-scroll-enable;
         absolute-top-edge-scroll-enable;
-        absolute-scroll-zone = <320>;
+        absolute-scroll-zone = <260>;
         absolute-scroll-divisor = <80>;
         absolute-aux-tap-area-width = <0>;
         absolute-aux-tap-area-height = <0>;
