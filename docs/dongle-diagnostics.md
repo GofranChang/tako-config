@@ -130,3 +130,14 @@ V2 的 `tap_movement_limit` 显示当前有效门槛，`BLE latency` 显示实�
 诊断产物：`../zmk-local/firmware/diagnostics/tako_right_cirque_tx8.uf2`，只刷右半，保留 dongle 和 USB 诊断连接。由四个 shield 构建：`tako_right tako_cirque_right tako_cirque_probe tako_cirque_tx8`。刷后用 `cirque_probe show` 确认默认门槛 20、实际 latency 30，再清零计数做连续画圈比较。恢复原诊断版或普通右侧 Cirque UF2 即可撤销。
 
 2026-11-01 后续：用户反馈 TX8 手感改善，普通右侧固件已纳入 TX8 和起步门槛 20；原 `tako_cirque_tx8` shield 保留作历史复现入口，当前与普通右侧的这些参数相同。现在恢复普通右侧 UF2 只会移除诊断，不再撤销 TX8。原版 80/3 参数需要检出此前提交重建。接收端按用户要求改为线性 1.5 倍、Mouse Q/T 调速、Space 恢复默认，并关闭右侧边缘自动续移。
+
+
+### 原子 XY 版本（V3）
+
+后续用户确认：普通 TX8 固件虽然不再明显掉帧，但停手后仍回放约半秒；Mouse 层按键模拟光标能立即停止。这支持继续排查输入发送积压，不能把平滑直接当作低延迟。
+
+`codex/tako-cirque-packed-motion` 将右侧每帧的 X/Y 合为一个私有输入事件，到接收端输入线程内再展开。约 100 Hz 的运动从每秒约 200 次通知降至约 100 次；采样率、TX8、连接参数、起步门槛20、线性1.5倍及Q/T、Z控制保持不变。先更新配套 dongle/左主，再更新右侧；旧接收端不能解析私有包。
+
+`firmware/packed-motion/tako_right_cirque_probe.uf2` 使用标记 `TAKO_CIRQUE_PROBE_V3_PACKED_XY`，仍支持原来的 show/reset/tap20/tap80/latency0/latency30 命令。由于正式配置起步门槛已为20，tap80命令恢复的是当前配置值20，而不是旧版本80。
+
+V3 中每个私有运动事件计为一帧；仅移动时，queued 与 tx_events 应大致等于 generated_frames，不再约为两倍；点击、模式状态等事件会使数字略有差异。生成帧/处理帧的时间分布仍可比较。原 dongle 诊断屏的 M/I 也将按每个私有包计数，不能直接与旧版逐轴事件数比较。

@@ -12,6 +12,7 @@
 #include <zephyr/input/input.h>
 #include <zmk/split/peripheral.h>
 #include "cirque_probe.h"
+#include "cirque_motion_packet.h"
 
 enum {
     IRQ, WORK, READ_OK, READ_ERROR, CONTACT, LOW_Z,
@@ -59,11 +60,11 @@ void tako_cirque_probe_sample(int result, uint8_t z) {
 }
 void tako_cirque_probe_report(int result, uint16_t code, int32_t value, bool sync) {
     atomic_inc(&counts[result < 0 ? DROPPED : QUEUED]);
-    if (code != INPUT_REL_X && code != INPUT_REL_Y) {
+    if (code != INPUT_REL_X && code != INPUT_REL_Y && code != TAKO_CIRQUE_MOTION_CODE) {
         return;
     }
     if (value) { atomic_set(&nonzero_frame, 1); }
-    if (!sync) { return; }
+    if (!sync && code != TAKO_CIRQUE_MOTION_CODE) { return; }
     atomic_inc(&counts[GENERATED_FRAMES]);
     if (atomic_set(&nonzero_frame, 0)) { atomic_inc(&counts[NONZERO_FRAMES]); }
     uint32_t now = k_cycle_get_32();
@@ -77,8 +78,9 @@ void tako_cirque_probe_report(int result, uint16_t code, int32_t value, bool syn
 }
 
 static void input_probe(struct input_event *event) {
-    if (event->type == INPUT_EV_REL && event->sync &&
-        (event->code == INPUT_REL_X || event->code == INPUT_REL_Y)) {
+    if ((event->type == INPUT_EV_MSC && event->code == TAKO_CIRQUE_MOTION_CODE) ||
+        (event->type == INPUT_EV_REL && event->sync &&
+         (event->code == INPUT_REL_X || event->code == INPUT_REL_Y))) {
         atomic_inc(&counts[DISPATCHED_FRAMES]);
         uint32_t now = k_cycle_get_32();
         uint32_t previous = (uint32_t)atomic_set(&last_dispatch, now);
@@ -128,7 +130,7 @@ static int probe_reset(const struct shell *sh, size_t argc, char **argv) {
 }
 static int probe_show(const struct shell *sh, size_t argc, char **argv) {
     ARG_UNUSED(argc); ARG_UNUSED(argv);
-    shell_print(sh, "TAKO_CIRQUE_PROBE_V2 elapsed_ms=%lld", (long long)(k_uptime_get() - reset_at));
+    shell_print(sh, "TAKO_CIRQUE_PROBE_V3_PACKED_XY elapsed_ms=%lld", (long long)(k_uptime_get() - reset_at));
     shell_print(sh, "irq=%u work=%u read=%u read_err=%u contact=%u low_z=%u",
                 get(IRQ), get(WORK), get(READ_OK), get(READ_ERROR), get(CONTACT), get(LOW_Z));
     shell_print(sh, "generated_frames=%u nonzero_frames=%u dispatched_frames=%u queued=%u dropped=%u",

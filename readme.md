@@ -100,7 +100,19 @@ Tako 右半（BLE peripheral）── Tako 左半（central）── USB ── 
 
 ## 右侧 Cirque 触控板
 
-当前分支 `codex/tako-sweep-pro-cirque` 采用 [Sweep-Pro 的固定版本](https://github.com/nxtkb/Sweep-Pro/tree/9bf146cafbde166aef42b2a6f4ba3f7c1acd8a84)，使用同一驱动 [nxtkb/cirque-input-module@8af03a4](https://github.com/nxtkb/cirque-input-module/tree/8af03a4c061580c14ec8745caf0fa2dd3fc7f042)。右侧触控板替换 nice!view，左侧 nice!view 保留。七种固件输出不变。
+当前分支 `codex/tako-cirque-packed-motion`（基于 `df951f4`） 采用 [Sweep-Pro 的固定版本](https://github.com/nxtkb/Sweep-Pro/tree/9bf146cafbde166aef42b2a6f4ba3f7c1acd8a84)，使用同一驱动 [nxtkb/cirque-input-module@8af03a4](https://github.com/nxtkb/cirque-input-module/tree/8af03a4c061580c14ec8745caf0fa2dd3fc7f042)。右侧触控板替换 nice!view，左侧 nice!view 保留。七种固件输出不变。
+
+### 原子 X/Y 传输与版本配套
+
+本分支针对停手后光标仍回放约半秒的问题，将每帧 X/Y 从两次 BLE 通知改为一次私有运动事件（`INPUT_EV_MSC`、code `0x544b`，value 中各保留完整有符号 16 位坐标）。100 Hz 运动因此约需 100 次通知/秒，而不是约 200 次。右侧输入队列也以整帧入队，避免 X/Y 被分开排队。
+
+接收端在自己的输入线程内展开 X/Y，然后经过原来的线性 1.5 倍、运行时速度和 Z 滚动处理。保持原 sync 标志；按键、鼠标按钮、滚轮仍按标准事件传输。没有新增延时定时器、扩大队列、降低采样率或主动丢弃位移；这能降低发送负载，但实机是否消除积压仍需验证。
+
+**必须配套更新接收端和右侧 Cirque。先刷本目录的 dongle（或左主），再刷右侧。** 新接收端仍兼容原来的逐轴事件；旧接收端不认识新运动包，混用会导致触控板不动。普通左右键盘从设备的按键协议不变，左侧 nice!view 保留。
+
+产物独立存放在 `../zmk-local/firmware/packed-motion/`，不会覆盖上一分支的 `sweep-pro/` 对照固件。普通右侧为 `tako_right_cirque.uf2`；可选 `tako_right_cirque_probe.uf2` 带 `TAKO_CIRQUE_PROBE_V3_PACKED_XY` 诊断计数，功能参数相同。诊断时保持 dongle 和右半 USB 同时连接。
+
+编码测试：`cc -std=c99 -Wall -Wextra -Werror -fsanitize=undefined -I config/boards/shields/tako tests/cirque_motion_packet_test.c -o /tmp/tako-motion-packet-test && /tmp/tako-motion-packet-test`，覆盖正负边界及每个轴的全部 16 位取值。七种普通固件和 V3 诊断版已完整编译通过；另核对生成的接收分支，确认同步标志、按钮顺序及原生滚轮透传保持原逻辑。
 
 ### 接线与刷写
 
@@ -165,13 +177,13 @@ Q/T 每次细调运行系数 `0.01x`（指针基准 1.5 倍下约为 0.015 倍�
 
 保留 Tako 的 EC 矩阵、MUX/ADC、50% 触发、校准串口、15 分钟睡眠与 reset 恢复方式，以及 dongle OLED 的 180° 方向。没有照搬 Sweep-Pro 的禁用睡眠或 Z/X 长按键位。新驱动没有旧 Toucan 驱动的设备挂起关断实现，休眠时触控板本体的电流需实测。
 
-ZMK 保持 v0.3，EC 和显示模块保持原版本。仓库根目录注册 Zephyr 模块，通过 `nxtkb_v03_compat.cmake` 在构建目录生成三处 API 兼容副本（endpoint 命名及输入回调签名），另有右侧专用的绝对 Y 方向和小位移余数修正，同样只生成构建目录副本，不修改依赖仓库；reset 固件跳过无关的驱动辅助源码。GitHub Actions v0.3 工作流会自动发现根目录模块，本地构建也需将本仓库加入 `ZMK_EXTRA_MODULES`。
+ZMK 保持 v0.3，EC 和显示模块保持原版本。仓库根目录注册 Zephyr 模块，通过 `nxtkb_v03_compat.cmake` 在构建目录生成三处 API 兼容副本（endpoint 命名及输入回调签名），另有右侧专用的绝对 Y 方向和小位移余数修正，同样只生成构建目录副本，不修改依赖仓库；`cirque_motion_packet.cmake` 在应用源文件注册完成后生成发送端/接收端配套副本。reset 固件跳过无关的驱动辅助源码。GitHub Actions v0.3 工作流会自动发现根目录模块，本地构建也需将本仓库加入 `ZMK_EXTRA_MODULES`。
 
 旧驱动的独立 Cirque 工作队列补丁随迁移移除；新驱动原生使用 `K_NO_WAIT` 上报输入。可选的 [dongle 诊断屏幕](docs/dongle-diagnostics.md) 仍保留。构建与键位验证不能代替实机测试；偶发延迟、方向、边缘手势和续航请刷整套后确认。
 
 七种固件已完整本地编译通过。最终 EDT 与旧版本对比确认：18 个非 Mouse 层和全部组合键不变，两个 Mouse 层包含 Q/T 调速、Z 滚动及 Space 恢复默认；EC kscan、MUX 和矩阵映射不变。传感器以参考配置为基线（保留 Tako 的引脚，按实机结果修正坐标方向、压力门槛和起步门槛；默认绝对模式关闭边缘滚动及续移），两个接收端的处理器参数与输入通道已核对。
 
-本地七种 UF2 位于 `../zmk-local/firmware/sweep-pro/`。本分支仅本地提交，尚未推送或验证远程 Actions。
+本地七种 UF2 位于 `../zmk-local/firmware/packed-motion/`，另有可选右侧诊断 UF2。本分支仅本地提交，尚未推送或验证远程 Actions。
 
 ## 输出切换、屏幕与符号层
 
