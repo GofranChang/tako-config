@@ -1,4 +1,4 @@
-/* Sweep-Pro behaviors with Tako linear pointer scaling; scroll settings retained. */
+/* Sweep-Pro behaviors with Tako linear pointer scaling and half-speed scroll. */
 #ifndef TAKO_SWEEP_PRO_PROCESSORS
 #define TAKO_SWEEP_PRO_PROCESSORS
 / {
@@ -20,7 +20,7 @@
         native-wheel-axis = "horizontal-when-enabled";
         scroll-min-step = <1>;
         one-x-multiplier = <1>;
-        one-x-divisor = <1>;
+        one-x-divisor = <2>;
         min-percent = <10>;
         max-percent = <1000>;
         initial-speed-position = <50>;

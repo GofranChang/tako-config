@@ -58,6 +58,11 @@
         /* Lower-right tap zone follows the corrected mounting orientation. */
         absolute-secondary-tap-area-width = <520>;
         absolute-secondary-tap-area-height = <420>;
+        /* Start on the logical right/top edge; lock the axis until lift. */
+        absolute-right-edge-scroll-enable;
+        absolute-top-edge-scroll-enable;
+        absolute-scroll-zone = <320>;
+        absolute-scroll-divisor = <80>;
         absolute-aux-tap-area-width = <0>;
         absolute-aux-tap-area-height = <0>;
         startup-delay-ms = <1500>;
