@@ -15,3 +15,6 @@ config SHIELD_TAKO_CIRQUE_RECEIVER
 
 config SHIELD_TAKO_DONGLE_DIAGNOSTICS
   def_bool $(shields_list_contains,tako_dongle_diagnostics)
+
+config SHIELD_TAKO_CIRQUE_PROBE
+  def_bool $(shields_list_contains,tako_cirque_probe)

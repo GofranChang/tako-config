@@ -79,6 +79,29 @@ function(tako_nxtkb_absolute_y)
       string(REPLACE "${header_anchor}"
         "${header_anchor}\n\tint32_t motion_remainder_x;\n\tint32_t motion_remainder_y;"
         header "${header}")
+      if(CONFIG_SHIELD_TAKO_CIRQUE_PROBE)
+        set(irq_anchor "\tk_work_submit(&drv_data->work);")
+        set(work_anchor "\tpinnacle_handle_interrupt(drv_data->dev);")
+        set(read_anchor [=[	if (rc) {
+		LOG_ERR("Failed to read data packets");
+		return rc;
+	}]=])
+        foreach(anchor IN ITEMS irq_anchor work_anchor read_anchor)
+          string(FIND "${content}" "${${anchor}}" found)
+          if(found EQUAL -1)
+            message(FATAL_ERROR "Pinned Cirque probe anchor missing: ${anchor}")
+          endif()
+        endforeach()
+        string(PREPEND content "#include \"cirque_probe.h\"\n")
+        string(REPLACE "${irq_anchor}" "\ttako_cirque_probe_irq();\n${irq_anchor}" content "${content}")
+        string(REPLACE "${work_anchor}" "\ttako_cirque_probe_work();\n${work_anchor}" content "${content}")
+        string(REPLACE "${read_anchor}"
+          "\ttako_cirque_probe_sample(rc, rc ? 0 : (pinnacle_is_relative_mode(dev) ? 63 : sample->abs_z));\n${read_anchor}"
+          content "${content}")
+        string(REPLACE "(void)input_report_rel(dev, code, value, sync, K_NO_WAIT);"
+          "tako_cirque_probe_report(input_report_rel(dev, code, value, sync, K_NO_WAIT), code, value, sync);"
+          content "${content}")
+      endif()
       set(output "${PROJECT_BINARY_DIR}/tako-nxtkb-compat/input_pinnacle.c")
       file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tako-nxtkb-compat")
       file(WRITE "${PROJECT_BINARY_DIR}/tako-nxtkb-compat/input_pinnacle.h" "${header}")

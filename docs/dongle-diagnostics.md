@@ -69,3 +69,40 @@ west build zmk/app -d build/tako_dongle_diagnostics -b nice_nano_v2 -p always \
 本地完整编译 `tako_right_cirque` 通过；编译数据库确认仅 Pinnacle 源文件带此头文件，最终反汇编确认 GPIO 回调提交到 `tako_cirque_work_q`，且右半最终 `.config` 与上版完全相同。实际是否解决现场问题仍需用户实测。
 
 本次只需更新右半 `tako_right_cirque.uf2`；dongle 保留诊断版，便于观察 M/I/U 是否持续增长。不清绑定、不重置校准，不改 GPIO、方向、灵敏度或睡眠配置。验证通过后可给 dongle 刷回普通界面。
+
+## 右侧画圈卡顿诊断（可选）
+
+当小圈移动也不连续、停手后不追着移动，先测量采样与传输，而不继续扩大队列或调整速度。额外 shield `tako_cirque_probe` 只供右侧 Cirque 使用，增加 `cirque_probe show/reset` 两个校准串口命令。默认 `build.yaml` 七种固件不启用它；不增加后台定时器，不改变触控参数、工作队列、BLE 参数或校准。每次输入只更新少量计数，发送包装函数只转发一次调用并保留返回值。
+
+本地诊断产物：`../zmk-local/firmware/diagnostics/tako_right_cirque_probe.uf2`。只刷右半；dongle 和左半保持当前固件。**测试时 dongle 继续插着，右半同时用 USB 接到 Mac**，USB 仅用于读取校准串口，光标仍通过 dongle 输出。无需清绑定或重新校准。刷普通 `tako_right_cirque.uf2` 即可移除诊断。
+
+在已配置的本地 west 环境中构建：
+
+```sh
+west build zmk/app -d build/sweep-pro-cirque-probe -b nice_nano_v2 -p always \
+  -S zmk-analog-matrix-calibrator -- \
+  '-DSHIELD=tako_right tako_cirque_right tako_cirque_probe' \
+  '-DZMK_CONFIG=/Users/gofran/Documents/workspace/keyboard/tako-config/config'
+```
+
+采样流程：
+
+1. 串口执行 `cirque_probe reset`，仅清诊断计数。
+2. 在触控板中央连续画圈约 10 秒，不按 Mouse 层 Z，避免边缘自动移动干扰读数。
+3. 抬手后执行 `cirque_probe show`，保存输出。
+
+输出标记 `TAKO_CIRQUE_PROBE_V1` 也用于确认确实刷入了诊断固件。计数含义：
+
+| 字段 | 含义 |
+| --- | --- |
+| irq / work / read / read_err | DR 中断、读取工作、成功取样及失败次数；irq 明显多于 work 说明有工作合并，不能直接等同于蓝牙丢包 |
+| contact / low_z | 非零压力样本数、低于触摸门槛的样本数；low_z 多可能反复中断触摸状态 |
+| generated_frames / nonzero_frames | 产生的 X/Y 同步帧数，以及其中位移非零的帧数；不是 USB 上报频率 |
+| dispatched_frames / queued / dropped | 输入线程处理的帧数、成功入队的相对事件数及入队失败数；不是同一计数单位 |
+| tx_events / tx_err / max_tx_us | 向 split 传输提交的输入事件数、失败数及最慢一次提交耗时；提交成功不代表主机已收到 |
+| max_irq_wait_us | 最长一次 DR 中断到读取工作开始的等待时间 |
+| frame_gaps_us | 产生 X/Y 帧的时间间隔分布；起止停顿也可能落在大间隔一栏，需结合连续滑动的主要分布判断 |
+| BLE interval_us / latency | 实际协商的连接间隔和 peripheral latency；latency 是允许跳过的连接事件数，不能直接当作每帧延迟 |
+| feed / sample_rate_reg / read_rc | 芯片模式、采样率寄存器原值及读取结果；feed 的 bit1 为绝对模式标记 |
+
+这里只诊断到右半向 BLE 提交事件的路径。若读数正常而光标仍不连续，再使用 dongle 端计数核对接收和 USB 上报。
