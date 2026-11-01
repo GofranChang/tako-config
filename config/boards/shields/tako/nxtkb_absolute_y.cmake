@@ -29,6 +29,36 @@ function(tako_nxtkb_absolute_y)
       string(REPLACE "${position_anchor}"
         "${position_anchor}\n\tif (config->invert_y) {\n\t\ty = height - y;\n\t}"
         content "${content}")
+      # Tap zones must follow the same mounting transform as pointer motion.
+      set(tap_anchor [=[	int32_t right = pinnacle_abs_right(config);
+	int32_t left = pinnacle_abs_left(config);
+	int32_t top = pinnacle_abs_top(config);
+	int32_t bottom = pinnacle_abs_bottom(config);
+	int32_t left_boundary = MAX(left, right - config->absolute_secondary_tap_area_width);
+	int32_t top_boundary = MAX(top, bottom - config->absolute_secondary_tap_area_height);
+
+	return x >= left_boundary && y >= top_boundary;]=])
+      set(tap_fixed [=[	int32_t logical_x, logical_y, width, height;
+	pinnacle_absolute_logical_position(config, x, y, &logical_x, &logical_y,
+	                                   &width, &height);
+	return logical_x >= MAX(0, width - config->absolute_secondary_tap_area_width) &&
+	       logical_y >= MAX(0, height - config->absolute_secondary_tap_area_height);]=])
+      set(tap_function "static bool pinnacle_absolute_point_in_lower_right(")
+      foreach(anchor IN ITEMS tap_anchor tap_function)
+        string(FIND "${content}" "${${anchor}}" found)
+        if(found EQUAL -1)
+          message(FATAL_ERROR "Pinned Cirque tap-zone patch anchor missing: ${anchor}")
+        endif()
+      endforeach()
+      string(REPLACE "${tap_anchor}" "${tap_fixed}" content "${content}")
+      set(position_declaration [=[static void pinnacle_absolute_logical_position(const struct pinnacle_config *config,
+                                             uint16_t raw_x, uint16_t raw_y,
+                                             int32_t *logical_x, int32_t *logical_y,
+                                             int32_t *logical_width, int32_t *logical_height);
+
+]=])
+      string(REPLACE "${tap_function}" "${position_declaration}${tap_function}"
+        content "${content}")
       # Preserve subpixel movement before the receiver's speed processor.
       set(scale_anchor [=[static int16_t pinnacle_scale_absolute_delta(const struct device *dev, int32_t delta)
 {

@@ -55,6 +55,7 @@
         absolute-tap-drag-enable;
         absolute-tap-drag-timeout-ms = <300>;
         absolute-tap-drag-max-movement = <160>;
+        /* Lower-right tap zone follows the corrected mounting orientation. */
         absolute-secondary-tap-area-width = <520>;
         absolute-secondary-tap-area-height = <420>;
         absolute-aux-tap-area-width = <0>;
