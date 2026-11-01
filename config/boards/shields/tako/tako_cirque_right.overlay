@@ -51,6 +51,7 @@
         absolute-relative-multiplier = <3>;
         absolute-relative-divisor = <10>;
         absolute-tap-click-ms = <30>;
+        absolute-tap-max-movement = <20>;
         absolute-tap-drag-enable;
         absolute-tap-drag-timeout-ms = <300>;
         absolute-tap-drag-max-movement = <160>;
@@ -58,11 +59,6 @@
         absolute-secondary-tap-area-height = <420>;
         absolute-aux-tap-area-width = <0>;
         absolute-aux-tap-area-height = <0>;
-        absolute-edge-motion-enable;
-        absolute-edge-motion-zone = <80>;
-        absolute-edge-motion-speed = <4>;
-        absolute-edge-motion-interval-ms = <10>;
-        absolute-edge-motion-start-ms = <120>;
         startup-delay-ms = <1500>;
         primary-tap-enable;
         glide-extend-enable;

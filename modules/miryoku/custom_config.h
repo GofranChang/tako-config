@@ -30,10 +30,10 @@ U_NP,                  U_NP,                  U_NA,                  U_NA,      
 &kp TILDE,             &kp EXCL,              &kp AT,                &kp HASH,              &kp PIPE,              U_NA,                  &u_to_U_SYM,           &kp LPAR,              &kp RPAR,              U_NA, \
 U_NP,                  U_NP,                  &kp LPAR,              &kp RPAR,              &kp UNDER,             U_NA,                  U_NA,                  U_NA,                  U_NP,                  U_NP
 
-// Sweep-Pro pointing controls in previously unused Mouse positions only.
+// Mouse Q/T adjust pointer speed; Z holds scroll; Space resets speeds.
 // Keep all Miryoku clipboard, modifiers, movement and wheel keys.
 #define MIRYOKU_LAYER_MOUSE \
-U_BOOT, &u_to_U_TAP, &u_to_U_EXTRA, &u_to_U_BASE, &tako_pointer_reset, U_RDO, U_PST, U_CPY, U_CUT, U_UND, \
+&ptr_spd 0 3, &u_to_U_TAP, &u_to_U_EXTRA, &u_to_U_BASE, &ptr_spd 0 4, U_RDO, U_PST, U_CPY, U_CUT, U_UND, \
 &kp LGUI, &kp LALT, &kp LCTRL, &kp LSHFT, &crq_mode 2, U_MS_L, U_MS_D, U_MS_U, U_MS_R, &ptr_spd 1 3, \
-&drgscrl, &kp RALT, &u_to_U_SYM, &u_to_U_MOUSE, &ptr_spd 0 4, U_WH_L, U_WH_D, U_WH_U, U_WH_R, &ptr_spd 1 4, \
-U_NP, U_NP, U_NA, &ptr_spd 0 3, U_NA, U_BTN2, U_BTN1, U_BTN3, U_NP, U_NP
+&drgscrl, &kp RALT, &u_to_U_SYM, &u_to_U_MOUSE, U_NA, U_WH_L, U_WH_D, U_WH_U, U_WH_R, &ptr_spd 1 4, \
+U_NP, U_NP, U_NA, &tako_pointer_reset, U_NA, U_BTN2, U_BTN1, U_BTN3, U_NP, U_NP

@@ -1,4 +1,4 @@
-/* Sweep-Pro 9bf146c: pointer and scroll settings, unchanged. */
+/* Sweep-Pro behaviors with Tako linear pointer scaling; scroll settings retained. */
 #ifndef TAKO_SWEEP_PRO_PROCESSORS
 #define TAKO_SWEEP_PRO_PROCESSORS
 / {
@@ -6,13 +6,9 @@
         compatible = "zmk,input-processor-pointer-speed";
         #input-processor-cells = <2>;
         track-remainders;
-        pointer-curve = "adaptive";
-        pointer-curve-deadzone = <2>;
-        pointer-curve-accel-multiplier = <1>;
-        pointer-curve-accel-divisor = <12>;
-        pointer-curve-max-delta = <120>;
-        one-x-multiplier = <1>;
-        one-x-divisor = <1>;
+        pointer-curve = "linear";
+        one-x-multiplier = <3>;
+        one-x-divisor = <2>;
         min-percent = <10>;
         max-percent = <400>;
         initial-speed-position = <50>;

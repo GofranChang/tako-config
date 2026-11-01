@@ -211,11 +211,11 @@ layers:
   - RET
   - BSPC
   WIN Mouse:
-  - BOOT
+  - Pointer -
   - '&u_to_U_TAP'
   - '&u_to_U_EXTRA'
   - '&u_to_U_BASE'
-  - Reset Speeds
+  - Pointer +
   - Ctl+Y
   - Ctl+V
   - Ctl+C
@@ -235,13 +235,13 @@ layers:
   - AltGr
   - '&u_to_U_SYM'
   - '&u_to_U_MOUSE'
-  - Pointer +
+  - ''
   - Scroll L
   - Scroll D
   - Scroll U
   - Scroll R
   - Scroll +
-  - Pointer -
+  - Reset Speeds
   - type: held
   - Mouse 2
   - Mouse 1
@@ -608,14 +608,14 @@ layers:
   - RET
   - BSPC
   MAC Mouse:
-  - BOOT
+  - Pointer -
   - t: Tap
     h: 2x
   - t: Extra
     h: 2x
   - t: Base
     h: 2x
-  - Reset Speeds
+  - Pointer +
   - Sft+Gui+Z
   - Gui+V
   - Gui+C
@@ -637,13 +637,13 @@ layers:
     h: 2x
   - t: Mouse
     h: 2x
-  - Pointer +
+  - ''
   - Scroll L
   - Scroll D
   - Scroll U
   - Scroll R
   - Scroll +
-  - Pointer -
+  - Reset Speeds
   - type: held
   - Mouse 2
   - Mouse 1

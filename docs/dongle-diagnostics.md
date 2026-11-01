@@ -128,3 +128,5 @@ V2 的 `tap_movement_limit` 显示当前有效门槛，`BLE latency` 显示实�
 可选 `tako_cirque_tx8` shield 将 `BT_L2CAP_TX_BUF_COUNT`、`BT_BUF_ACL_TX_COUNT`、`BT_CONN_TX_MAX` 从 3 同时改为 8，并保留已确认改善起步的门槛 20；不改变 PHY、连接间隔、peripheral latency、采样率或应用事件队列。它只增加可用发送资源，不保证解决空中传输或接收端瓶颈。普通七份固件保持不变。
 
 诊断产物：`../zmk-local/firmware/diagnostics/tako_right_cirque_tx8.uf2`，只刷右半，保留 dongle 和 USB 诊断连接。由四个 shield 构建：`tako_right tako_cirque_right tako_cirque_probe tako_cirque_tx8`。刷后用 `cirque_probe show` 确认默认门槛 20、实际 latency 30，再清零计数做连续画圈比较。恢复原诊断版或普通右侧 Cirque UF2 即可撤销。
+
+2026-11-01 后续：用户反馈 TX8 手感改善，普通右侧固件已纳入 TX8 和起步门槛 20；原 `tako_cirque_tx8` shield 保留作历史复现入口，当前与普通右侧的这些参数相同。现在恢复普通右侧 UF2 只会移除诊断，不再撤销 TX8。原版 80/3 参数需要检出此前提交重建。接收端按用户要求改为线性 1.5 倍、Mouse Q/T 调速、Space 恢复默认，并关闭右侧边缘自动续移。
