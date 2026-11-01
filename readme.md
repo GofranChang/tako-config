@@ -151,13 +151,19 @@ I²C 使用 100 kHz / 地址 `0x2a`，右侧 SPI1 和显示关闭。Cirque 本�
 
 速度每次细调 `0.01x`，按住连续调整。指针范围 `0.1x–4x`，滚动范围 `0.1x–10x`；速度按 USB 和各 BLE 主机配置分别保存，模式切换也会保存。绝对模式的软件手势与相对模式的芯片原生行为不同；再次按 G 可切回。
 
+### 小圈移动连续性
+
+右侧驱动原先对每次绝对位移单独乘 `3/10` 并取整，原始增量 1–3 会变成 0。现在分别为 X/Y 保留缩放余数，在后续移动中累计；每次抬手、新接触及模式切换都清零，不跨手势残留。保留原有总速度、加速曲线、方向和 Mouse 层 Z 滚动；不增加定时缓冲或延后上报。实机掉帧感是否改善仍需刷右侧验证。
+
+回归检查：`cc -std=c99 -Wall -Wextra -Werror -I config/boards/shields/tako tests/cirque_motion_test.c -o /tmp/tako-cirque-motion-test && /tmp/tako-cirque-motion-test`。覆盖正负小位移累计、双轴独立、变向后的位移守恒、静止不续动及余数清零。
+
 ### 实现与验证
 
 传感器参数在 `tako_cirque_right.overlay`，速度处理器与行为在 `tako-sweep-pro-processors.dtsi`，接收端 pipeline 在 `tako_cirque_receiver.overlay`。右侧和接收端沿用参考工程的输入队列 64、行为队列 512、主线程/系统工作队列栈各 8192、堆 16384、输入栈 4096、关闭 2M PHY、开启实验连接参数及 +8 dBm；接收端启用平滑滚动和 64 项 BLE 鼠标队列。
 
 保留 Tako 的 EC 矩阵、MUX/ADC、50% 触发、校准串口、15 分钟睡眠与 reset 恢复方式，以及 dongle OLED 的 180° 方向。没有照搬 Sweep-Pro 的禁用睡眠或 Z/X 长按键位。新驱动没有旧 Toucan 驱动的设备挂起关断实现，休眠时触控板本体的电流需实测。
 
-ZMK 保持 v0.3，EC 和显示模块保持原版本。仓库根目录注册 Zephyr 模块，通过 `nxtkb_v03_compat.cmake` 在构建目录生成三处 API 兼容副本（endpoint 命名及输入回调签名），另有右侧专用的绝对 Y 方向修正，同样只生成构建目录副本，不修改依赖仓库；reset 固件跳过无关的驱动辅助源码。GitHub Actions v0.3 工作流会自动发现根目录模块，本地构建也需将本仓库加入 `ZMK_EXTRA_MODULES`。
+ZMK 保持 v0.3，EC 和显示模块保持原版本。仓库根目录注册 Zephyr 模块，通过 `nxtkb_v03_compat.cmake` 在构建目录生成三处 API 兼容副本（endpoint 命名及输入回调签名），另有右侧专用的绝对 Y 方向和小位移余数修正，同样只生成构建目录副本，不修改依赖仓库；reset 固件跳过无关的驱动辅助源码。GitHub Actions v0.3 工作流会自动发现根目录模块，本地构建也需将本仓库加入 `ZMK_EXTRA_MODULES`。
 
 旧驱动的独立 Cirque 工作队列补丁随迁移移除；新驱动原生使用 `K_NO_WAIT` 上报输入。可选的 [dongle 诊断屏幕](docs/dongle-diagnostics.md) 仍保留。构建与键位验证不能代替实机测试；偶发延迟、方向、边缘手势和续航请刷整套后确认。
 

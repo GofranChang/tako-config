@@ -2,7 +2,7 @@ include_guard(GLOBAL)
 
 # The pinned nxtkb driver applies invert-x, but ignores invert-y in its
 # absolute delta and edge-coordinate paths. Keep both in the same coordinate
-# system so a physical top-edge stroke selects horizontal scrolling.
+# system. Also retain per-axis fractional movement instead of dropping it.
 function(tako_nxtkb_absolute_y)
   if(NOT CONFIG_SHIELD_TAKO_CIRQUE_RIGHT)
     return()
@@ -29,8 +29,59 @@ function(tako_nxtkb_absolute_y)
       string(REPLACE "${position_anchor}"
         "${position_anchor}\n\tif (config->invert_y) {\n\t\ty = height - y;\n\t}"
         content "${content}")
+      # Preserve subpixel movement before the receiver's speed processor.
+      set(scale_anchor [=[static int16_t pinnacle_scale_absolute_delta(const struct device *dev, int32_t delta)
+{
+	const struct pinnacle_config *config = dev->config;
+	int64_t scaled = (int64_t)delta * config->absolute_relative_multiplier;
+
+	scaled /= config->absolute_relative_divisor;
+
+	return CLAMP(scaled, INT16_MIN, INT16_MAX);
+}]=])
+      set(scale_fixed [=[static int16_t pinnacle_scale_absolute_delta(const struct device *dev, int32_t delta,
+                                               int32_t *remainder)
+{
+	const struct pinnacle_config *config = dev->config;
+	int64_t scaled = tako_cirque_scale_delta(delta, config->absolute_relative_multiplier,
+                                              config->absolute_relative_divisor, remainder);
+	return CLAMP(scaled, INT16_MIN, INT16_MAX);
+}]=])
+      set(x_call "pinnacle_scale_absolute_delta(dev, delta_x)")
+      set(y_call "pinnacle_scale_absolute_delta(dev, delta_y)")
+      set(reset_anchor "drv_data->scroll_remainder = 0;")
+      foreach(anchor IN ITEMS scale_anchor x_call y_call reset_anchor)
+        string(FIND "${content}" "${${anchor}}" found)
+        if(found EQUAL -1)
+          message(FATAL_ERROR "Pinned Cirque motion patch anchor missing: ${anchor}")
+        endif()
+      endforeach()
+      string(REPLACE "${scale_anchor}" "${scale_fixed}" content "${content}")
+      string(REPLACE "${x_call}"
+        "pinnacle_scale_absolute_delta(dev, delta_x, &drv_data->motion_remainder_x)"
+        content "${content}")
+      string(REPLACE "${y_call}"
+        "pinnacle_scale_absolute_delta(dev, delta_y, &drv_data->motion_remainder_y)"
+        content "${content}")
+      # All existing scroll-reset sites are contact or mode boundaries.
+      string(REGEX REPLACE "(\n[\t ]*)drv_data->scroll_remainder = 0;"
+        "\\1drv_data->scroll_remainder = 0;\\1drv_data->motion_remainder_x = 0;\\1drv_data->motion_remainder_y = 0;"
+        content "${content}")
+      string(REPLACE "#include \"input_pinnacle.h\""
+        "#include \"input_pinnacle.h\"\n#include \"cirque_motion.h\"" content "${content}")
+      target_include_directories(drivers__input PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}")
+      file(READ "${driver_directory}/input_pinnacle.h" header)
+      set(header_anchor "\tint32_t scroll_remainder;")
+      string(FIND "${header}" "${header_anchor}" found)
+      if(found EQUAL -1)
+        message(FATAL_ERROR "Pinned Cirque motion state anchor missing")
+      endif()
+      string(REPLACE "${header_anchor}"
+        "${header_anchor}\n\tint32_t motion_remainder_x;\n\tint32_t motion_remainder_y;"
+        header "${header}")
       set(output "${PROJECT_BINARY_DIR}/tako-nxtkb-compat/input_pinnacle.c")
       file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tako-nxtkb-compat")
+      file(WRITE "${PROJECT_BINARY_DIR}/tako-nxtkb-compat/input_pinnacle.h" "${header}")
       file(WRITE "${output}" "/* Generated absolute-Y correction for the pinned nxtkb driver. */\n${content}")
       list(APPEND patched "${output}")
       math(EXPR patch_count "${patch_count} + 1")
