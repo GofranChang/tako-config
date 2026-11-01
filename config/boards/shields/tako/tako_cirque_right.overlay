@@ -5,14 +5,9 @@
 #include <zephyr/dt-bindings/i2c/i2c.h>
 #include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
 #include "tako-cirque-split.dtsi"
-#include <input/processors/transform.dtsi>
-#include <dt-bindings/zmk/input_transform.h>
 
 &tako_cirque_split {
     device = <&tako_cirque>;
-    /* The driver ignores invert-y in absolute mode. Transform REL_Y here
-     * before BLE forwarding, so both receiver topologies use this direction. */
-    input-processors = <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>;
 };
 
 &spi1 {
@@ -52,7 +47,7 @@
         sensitivity = "2x";
         data-mode = "absolute";
         idle-packets-count = <3>;
-        absolute-touch-min-z = <12>;
+        absolute-touch-min-z = <6>;
         absolute-relative-multiplier = <3>;
         absolute-relative-divisor = <10>;
         absolute-tap-click-ms = <30>;
@@ -70,12 +65,13 @@
         absolute-edge-motion-start-ms = <120>;
         absolute-right-edge-scroll-enable;
         absolute-top-edge-scroll-enable;
-        absolute-scroll-zone = <130>;
+        absolute-scroll-zone = <320>;
         absolute-scroll-divisor = <80>;
         startup-delay-ms = <1500>;
         primary-tap-enable;
         glide-extend-enable;
-        /* Y inversion is applied by the split processor in both modes. */
+        /* Applied to absolute deltas and edge coordinates by our pinned fix. */
+        invert-y;
         /* Preserve Tako horizontal mounting orientation. */
         invert-x;
     };

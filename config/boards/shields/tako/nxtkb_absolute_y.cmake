@@ -1,0 +1,46 @@
+include_guard(GLOBAL)
+
+# The pinned nxtkb driver applies invert-x, but ignores invert-y in its
+# absolute delta and edge-coordinate paths. Keep both in the same coordinate
+# system so a physical top-edge stroke selects horizontal scrolling.
+function(tako_nxtkb_absolute_y)
+  if(NOT CONFIG_SHIELD_TAKO_CIRQUE_RIGHT)
+    return()
+  endif()
+  get_target_property(sources drivers__input SOURCES)
+  set(patched "")
+  set(patch_count 0)
+  foreach(source IN LISTS sources)
+    if(source MATCHES "/cirque-input-module/drivers/input/input_pinnacle\\.c$")
+      file(READ "${source}" content)
+      get_filename_component(driver_directory "${source}" DIRECTORY)
+      target_include_directories(drivers__input PRIVATE "${driver_directory}")
+      set(delta_anchor "\tif (config->invert_x) {\n\t\t*delta_x = -*delta_x;\n\t}")
+      set(position_anchor "\tif (config->invert_x) {\n\t\tx = width - x;\n\t}")
+      foreach(anchor IN ITEMS delta_anchor position_anchor)
+        string(FIND "${content}" "${${anchor}}" found)
+        if(found EQUAL -1)
+          message(FATAL_ERROR "Pinned Cirque absolute-Y patch anchor missing: ${anchor}")
+        endif()
+      endforeach()
+      string(REPLACE "${delta_anchor}"
+        "${delta_anchor}\n\tif (config->invert_y) {\n\t\t*delta_y = -*delta_y;\n\t}"
+        content "${content}")
+      string(REPLACE "${position_anchor}"
+        "${position_anchor}\n\tif (config->invert_y) {\n\t\ty = height - y;\n\t}"
+        content "${content}")
+      set(output "${PROJECT_BINARY_DIR}/tako-nxtkb-compat/input_pinnacle.c")
+      file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tako-nxtkb-compat")
+      file(WRITE "${output}" "/* Generated absolute-Y correction for the pinned nxtkb driver. */\n${content}")
+      list(APPEND patched "${output}")
+      math(EXPR patch_count "${patch_count} + 1")
+    else()
+      list(APPEND patched "${source}")
+    endif()
+  endforeach()
+  if(NOT patch_count EQUAL 1)
+    message(FATAL_ERROR "Expected exactly one pinned Cirque input driver")
+  endif()
+  set_property(TARGET drivers__input PROPERTY SOURCES "${patched}")
+endfunction()
+cmake_language(DEFER DIRECTORY "${ZEPHYR_BASE}" CALL tako_nxtkb_absolute_y)
